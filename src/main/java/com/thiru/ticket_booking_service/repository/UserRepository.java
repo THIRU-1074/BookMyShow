@@ -1,0 +1,18 @@
+package com.thiru.ticket_booking_service.repository;
+
+
+import com.thiru.ticket_booking_service.entity.UserEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
+
+    Optional<UserEntity> findByMailId(String mailId);
+
+    boolean existsByMailId(String mailId);
+
+    boolean existsByPhoneNumber(String phoneNumber);
+
+}
+
