@@ -1,3 +1,41 @@
 spring:
   application:
     name: TicketBookingService
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ticket_booking
+    username: postgres
+    password: login@RDBMS1
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  security:
+    jwt:
+      accessTokenValidityMinutes: 15
+      refreshTokenValidityDays: 7
+      secret: VERY_SECRET_KEY_CHANGE_LATER_123456789 #must be in .env and should be loaded into windows
+
+server:
+  port: 9091
+
+logging:
+  level:
+    root: INFO
+
+    # Your application logs
+    com.thiru.ticket_booking_service: DEBUG
+
+    # Spring framework noise control
+    org.springframework: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+
+    # Hibernate (IMPORTANT)
+    org.hibernate.SQL: DEBUG # shows SQL
+    org.hibernate.orm.jdbc.bind: TRACE # shows bind params (Hibernate 6+)
+
+    # Disable unnecessary spam
+    org.hibernate.type: OFF
+    org.apache.catalina: WARN
+    org.springframework.boot.autoconfigure: WARN

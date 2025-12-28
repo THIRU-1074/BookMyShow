@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.util.List;
 
+import com.thiru.ticket_booking_service.entity.enums.Role;
+
 @Entity
 @Table(name = "users")
 @Getter

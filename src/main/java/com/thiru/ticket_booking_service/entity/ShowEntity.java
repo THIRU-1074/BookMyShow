@@ -1,6 +1,10 @@
 package com.thiru.ticket_booking_service.entity;
 
 import java.util.*;
+
+import com.thiru.ticket_booking_service.entity.enums.Genre;
+import com.thiru.ticket_booking_service.entity.enums.Language;
+
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;

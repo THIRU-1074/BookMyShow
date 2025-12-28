@@ -1,24 +1,21 @@
 package com.thiru.ticket_booking_service.service.securityServices;
 
 import com.thiru.ticket_booking_service.entity.*;
+import com.thiru.ticket_booking_service.dto.*;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.security.Key;
 import java.util.Date;
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-
     private final PasswordEncoder passwordEncoderService;
+    private final JwtProperties jwtProps;
 
-    private static final long ACCESS_TOKEN_VALIDITY_MS = 15 * 60 * 1000; // 15 mins
-    private static final String SECRET = "VERY_SECRET_KEY_CHANGE_LATER_123456789";
-
-    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
     /* ---------------- PASSWORD ---------------- */
 
@@ -28,13 +25,13 @@ public class AuthService {
 
     /* ---------------- JWT ---------------- */
 
-    public String generateAccessToken(UserEntity user) {
+    public String generateRefreshToken(UserEntity user) {
         return Jwts.builder()
-                .setSubject(user.getMailId())
+                .setSubject(user.getName())
                 .claim("role", user.getRole().name())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_MS))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProps.getRefreshTokenValidityMs()))
+                .signWith(jwtProps.getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -55,18 +52,39 @@ public class AuthService {
         }
     }
 
-    public String refreshAccessToken(String token) {
+    public String generateAccessToken(String token) {
         Claims claims = extractClaims(token);
 
         return Jwts.builder()
                 .setSubject(claims.getSubject())
                 .claim("role", claims.get("role"))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_MS))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProps.getAccessTokenValidityMs()))
+                .signWith(jwtProps.getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+    public void resolveAuthHeader(String authHeader,UserLoginRequest request) {
+        AuthType authType=null;
+        if (authHeader == null || authHeader.isBlank()) {
+            throw new IllegalArgumentException("Authorization header missing");
+        }
+        else if (authHeader.startsWith("Bearer")) {
+            authType= AuthType.JWT;
+            request.setPassword(authHeader.substring(7));
+        }
+        else if (authHeader.startsWith("Basic")) {
+            authType= AuthType.BASIC;
+            String basicToken = new String(
+        Base64.getDecoder().decode(authHeader.substring(6)),
+        StandardCharsets.UTF_8);
 
+            request.setUserName(basicToken.split(":")[0]);
+            request.setPassword(basicToken.split(":")[1]);
+        }
+        else
+            throw new IllegalArgumentException("Unsupported Authorization type");
+        request.setAuthType(authType);
+    }
     /* -------- NON-LOGIN AUTH (TOKEN VERIFY) -------- */
 
     public Claims verifyAccessToken(String token) {
@@ -75,7 +93,7 @@ public class AuthService {
 
     private Claims extractClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(key)
+                .setSigningKey(jwtProps.getKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

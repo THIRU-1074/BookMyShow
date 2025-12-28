@@ -3,6 +3,7 @@ package com.thiru.ticket_booking_service.service;
 import com.thiru.ticket_booking_service.repository.*;
 import com.thiru.ticket_booking_service.dto.*;
 import com.thiru.ticket_booking_service.entity.*;
+import com.thiru.ticket_booking_service.entity.enums.Role;
 import com.thiru.ticket_booking_service.service.securityServices.*;
 
 import lombok.RequiredArgsConstructor;
@@ -16,23 +17,21 @@ public class UserProfileService {
 
     private final UserRepository userRepository;
     private final AuthService authService;
-    public String login(UserLoginRequest request) {
-
-        UserEntity user = userRepository.findByMailId(request.getMailId())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
-
+    public AuthResponse login(UserLoginRequest request) {
         if (request.getAuthType() == AuthType.BASIC) {
+            UserEntity user = userRepository.findByName(request.getUserName())
+                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
             return handleBasicLogin(request, user);
         }
 
-        if (request.getAuthType() == AuthType.JWT) {
+        else if (request.getAuthType() == AuthType.JWT) {
             return handleJwtLogin(request);
         }
 
         throw new RuntimeException("Unsupported auth type");
     }
 
-    private String handleBasicLogin(UserLoginRequest request, UserEntity user) {
+    private AuthResponse handleBasicLogin(UserLoginRequest request, UserEntity user) {
 
         boolean valid = authService.verifyPassword(
                 request.getPassword(),
@@ -43,22 +42,39 @@ public class UserProfileService {
             throw new RuntimeException("Invalid credentials");
         }
 
-        // Generate fresh access token
-        return authService.generateAccessToken(user);
+        // Generate both tokens
+        String rtoken = authService.generateRefreshToken(user);
+        String atoken = authService.generateAccessToken(rtoken);
+
+        AuthResponse response = AuthResponse.builder()
+            .accessToken(atoken)
+            .refreshToken(rtoken)
+            .build();
+
+        return response;
+        //return json of both 
     }
 
-    private String handleJwtLogin(UserLoginRequest request) {
+    private AuthResponse handleJwtLogin(UserLoginRequest request) {
 
-        if (authService.isTokenExpired(request.getAccessToken())) {
+        if (authService.isTokenExpired(request.getPassword())) {
             throw new RuntimeException("401 UNAUTHORIZED - Token expired");
         }
 
-        if (!authService.isTokenValid(request.getAccessToken())) {
+        if (!authService.isTokenValid(request.getPassword())) {
             throw new RuntimeException("401 UNAUTHORIZED - Invalid token");
         }
 
-        // Token is valid → issue a new access token
-        return authService.refreshAccessToken(request.getAccessToken());
+        // Generate both tokens
+        String rtoken = request.getPassword();
+        String atoken = authService.generateAccessToken(rtoken);
+
+        AuthResponse response = AuthResponse.builder()
+            .accessToken(atoken)
+            .refreshToken(rtoken)
+            .build();
+
+        return response;
     }
     @Transactional
     public void signup(UserSignupRequest request) {
@@ -85,9 +101,9 @@ public class UserProfileService {
         userRepository.save(user);
     }
 
-        public UserProfileResponse getUserProfile(String email) {
+    public UserProfileResponse getUserProfile(String userName) {
 
-        UserEntity user = userRepository.findByMailId(email)
+        UserEntity user = userRepository.findByName(userName)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<UserBookingSummary> bookingDtos = user.getBookings()

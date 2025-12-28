@@ -7,8 +7,7 @@ import lombok.*;
 @Setter
 public class UserLoginRequest {
 
-    @NotBlank
-    private String mailId;
+    private String userName;
 
     // Used only for BASIC auth
     private String password;
@@ -16,7 +15,6 @@ public class UserLoginRequest {
     // Used only for JWT auth
     private String accessToken;
 
-    @NotBlank
     private AuthType authType;
 }
 

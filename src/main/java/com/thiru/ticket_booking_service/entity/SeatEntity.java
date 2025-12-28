@@ -1,5 +1,7 @@
 package com.thiru.ticket_booking_service.entity;
 
+import com.thiru.ticket_booking_service.entity.enums.SeatCategory;
+
 import jakarta.persistence.*;
 import lombok.*;
 

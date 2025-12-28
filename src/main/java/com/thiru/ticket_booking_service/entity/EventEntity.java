@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
 
+import com.thiru.ticket_booking_service.entity.enums.EventType;
+
 @Entity
 @Table(name = "events")
 @Getter

@@ -1,6 +1,8 @@
 package com.thiru.ticket_booking_service.repository;
 
 import com.thiru.ticket_booking_service.entity.*;
+import com.thiru.ticket_booking_service.entity.enums.EventType;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

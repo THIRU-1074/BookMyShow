@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+import com.thiru.ticket_booking_service.entity.enums.SeatCategory;
+
 @Entity
 @Table(name = "bookings")
 @Getter
