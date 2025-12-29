@@ -5,11 +5,12 @@ import org.springframework.http.*;
 import lombok.RequiredArgsConstructor;
 import io.jsonwebtoken.*;
 import java.util.*;
+import org.springframework.security.core.Authentication;
+import jakarta.validation.Valid;
 
 import com.thiru.ticket_booking_service.service.securityServices.*;
 import com.thiru.ticket_booking_service.dto.*;
 import com.thiru.ticket_booking_service.service.*;
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
@@ -40,39 +41,13 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<?> getUserProfile(
-            @RequestHeader("Authorization") String authorizationHeader) {
+            Authentication authentication) {
 
-        // 1️⃣ Check presence of token
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body("Missing or invalid Authorization header");
-        }
-
-        try {
-            // 2️⃣ Extract token
-            String token = authorizationHeader.substring(7);
-
-            // 3️⃣ AUTHORIZE (before calling service)
-            Claims claims = authService.verifyAccessToken(token);
-
+                    Claims claims = (Claims) authentication.getPrincipal();
             String userName = claims.getSubject();
-
-            // 4️⃣ Delegate to service
             UserProfileResponse response = userService.getUserProfile(userName);
 
             return ResponseEntity.ok(response);
-
-        } catch (ExpiredJwtException e) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body("Access token expired");
-
-        } catch (JwtException e) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid access token");
-        }
     }
     /*@GetMapping("/")
     public void viewHomePage(){
