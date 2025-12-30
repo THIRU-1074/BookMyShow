@@ -1,0 +1,42 @@
+package com.thiru.BookMyShow.ShowMgmt.venue;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import com.thiru.BookMyShow.ShowMgmt.venue.DTO.*;
+
+import org.springframework.http.*;
+import lombok.RequiredArgsConstructor;
+import io.jsonwebtoken.*;
+import java.util.*;
+
+@RestController
+@RequestMapping("/venue")
+@RequiredArgsConstructor
+public class VenueController {
+    private final VenueService venueService;
+
+    @PostMapping("/createVenue")
+    public ResponseEntity<?> createVenue(
+            @RequestBody CreateVenue venueDTO,
+            Authentication authentication) {
+
+        Claims claims = (Claims) authentication.getPrincipal();
+        venueDTO.setUserName(claims.getSubject());
+        venueService.create(venueDTO);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED).body(null);
+    }
+
+    @GetMapping("/readvenue")
+    public ResponseEntity<?> readvenue(
+            @RequestBody ReadVenue venueDTO,
+            Authentication authentication) {
+
+        List<VenueReadResponse> venues = venueService.read(venueDTO);
+
+        return ResponseEntity
+                .ok(venues);
+    }
+}

@@ -1,8 +1,11 @@
 spring:
+  main:
+    banner-mode: "off"
+    log-startup-info: false
   application:
     name: TicketBookingService
   datasource:
-    url: jdbc:postgresql://localhost:5432/ticket_booking
+    url: jdbc:postgresql://localhost:5432/bookmyshow
     username: postgres
     password: login@RDBMS1
 
@@ -15,27 +18,37 @@ spring:
       accessTokenValidityMinutes: 15
       refreshTokenValidityDays: 7
       secret: VERY_SECRET_KEY_CHANGE_LATER_123456789 #must be in .env and should be loaded into windows
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
 
 server:
   port: 9091
-
 logging:
   level:
     root: INFO
+    org.springframework: ERROR
+    org.hibernate: ERROR
+    org.springdoc: INFO
+# logging:
+#   level:
+#     root: INFO
 
-    # Your application logs
-    com.thiru.ticket_booking_service: DEBUG
+#     # Your application logs
+#     com.thiru.ticket_booking_service: DEBUG
 
-    # Spring framework noise control
-    org.springframework: INFO
-    org.springframework.web: INFO
-    org.springframework.security: INFO
+#     # Spring framework noise control
+#     org.springframework: INFO
+#     org.springframework.web: INFO
+#     org.springframework.security: INFO
 
-    # Hibernate (IMPORTANT)
-    org.hibernate.SQL: DEBUG # shows SQL
-    org.hibernate.orm.jdbc.bind: TRACE # shows bind params (Hibernate 6+)
+#     # Hibernate (IMPORTANT)
+#     org.hibernate.SQL: DEBUG # shows SQL
+#     org.hibernate.orm.jdbc.bind: TRACE # shows bind params (Hibernate 6+)
 
-    # Disable unnecessary spam
-    org.hibernate.type: OFF
-    org.apache.catalina: WARN
-    org.springframework.boot.autoconfigure: WARN
+#     # Disable unnecessary spam
+#     org.hibernate.type: OFF
+#     org.apache.catalina: WARN
+#     org.springframework.boot.autoconfigure: WARN
