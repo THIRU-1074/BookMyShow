@@ -34,3 +34,6 @@ build/
 
 ### Environment File
 .env
+
+### toDoList for better design
+/toDoList.txt
