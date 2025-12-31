@@ -1,4 +1,4 @@
-package com.thiru.BookMyShow.userMgmt;
+package com.thiru.BookMyShow.userMgmt.DTO;
 
 import com.thiru.BookMyShow.appSecurity.AuthType;
 

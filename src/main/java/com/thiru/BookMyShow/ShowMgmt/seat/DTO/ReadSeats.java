@@ -4,6 +4,7 @@ import lombok.*;
 
 @Getter
 @Setter
+@Builder
 public class ReadSeats {
     private Long auditoriumId;
     private ReadSeat[] seats;

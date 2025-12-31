@@ -3,6 +3,8 @@ package com.thiru.BookMyShow.ShowMgmt.seat;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.*;
 
+import com.thiru.BookMyShow.ShowMgmt.auditorium.*;
+
 public interface SeatRepository extends JpaRepository<SeatEntity, Long> {
         Optional<SeatEntity> findBySeatIdAndAuditorium_AuditoriumId(
                         Long seatId,
@@ -13,4 +15,6 @@ public interface SeatRepository extends JpaRepository<SeatEntity, Long> {
         List<SeatEntity> findBySeatIdInAndAuditorium_AuditoriumId(
                         Collection<Long> seatIds,
                         Long auditoriumId);
+
+        long countByAuditorium(AuditoriumEntity auditorium);
 }

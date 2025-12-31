@@ -30,4 +30,8 @@ public class UpdateShow {
     private String userName;
 
     private Long showId;
+
+    private Long BookedSeatCount;
+
+    private BookingStatus bookingStatus;
 }

@@ -1,4 +1,6 @@
-package com.thiru.BookMyShow.userMgmt;
+package com.thiru.BookMyShow.userMgmt.DTO;
+
+import com.thiru.BookMyShow.userMgmt.Role;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

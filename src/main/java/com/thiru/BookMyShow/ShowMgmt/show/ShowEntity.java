@@ -51,4 +51,9 @@ public class ShowEntity {
     @JoinColumn(name = "auditoriumId")
     private AuditoriumEntity auditorium;
 
+    @Enumerated(EnumType.STRING)
+    private BookingStatus bookingStatus;
+
+    private Long availableSeatCount;
+
 }

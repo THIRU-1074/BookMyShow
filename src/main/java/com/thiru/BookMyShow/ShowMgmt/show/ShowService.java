@@ -4,20 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.data.jpa.domain.Specification;
+import java.util.*;
+import jakarta.persistence.criteria.Predicate;
+
 import com.thiru.BookMyShow.exception.*;
 import com.thiru.BookMyShow.ShowMgmt.AuthorizationPolicy;
 import com.thiru.BookMyShow.ShowMgmt.auditorium.AuditoriumEntity;
 import com.thiru.BookMyShow.ShowMgmt.auditorium.AuditoriumRepository;
 import com.thiru.BookMyShow.ShowMgmt.event.EventEntity;
 import com.thiru.BookMyShow.ShowMgmt.event.EventRepository;
+import com.thiru.BookMyShow.ShowMgmt.seat.SeatRepository;
 import com.thiru.BookMyShow.ShowMgmt.show.DTO.*;
 import com.thiru.BookMyShow.ShowMgmt.showSeat.ShowSeatService;
 import com.thiru.BookMyShow.userMgmt.*;
-
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.data.jpa.domain.Specification;
-import java.util.*;
-import jakarta.persistence.criteria.Predicate;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
         private final AuditoriumRepository auditoriumRepo;
         private final UserRepository userRepo;
         private final ShowSeatService showSeatService;
+        private final SeatRepository seatRepo;
 
         @Override
         public void canCreate(UserEntity ue) {
@@ -76,12 +78,14 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.BAD_REQUEST,
                                                 "Invalid auditoriumId: " + show.getAuditoriumId()));
-
+                Long seatCount = seatRepo.countByAuditorium(auditorium);
                 // 3️⃣ Build ShowEntity (do NOT trust incoming object)
                 ShowEntity showEntity = ShowEntity.builder()
                                 .event(event)
                                 .auditorium(auditorium)
                                 .showName(show.getShowName())
+                                .availableSeatCount(seatCount)
+                                .bookingStatus(BookingStatus.NOT_STARTED)
                                 .showDateTime(show.getShowDateTime())
                                 .durationMinutes(show.getDurationMinutes())
                                 .genres(show.getGenres())
@@ -107,9 +111,19 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
 
                 // 3️⃣ Authorization (already implemented by you)
                 this.canUpdate(show, user);
-
+                if (request.getBookingStatus() != null)
+                        updateBookingStatus(show, request.getBookingStatus());
                 // 4️⃣ Partial updates (ONLY if non-null)
-
+                if (request.getBookedSeatCount() != null) {
+                        if (request.getBookedSeatCount() > show.getAvailableSeatCount())
+                                throw new InsufficientSeatsException(
+                                                request.getBookedSeatCount(),
+                                                show.getAvailableSeatCount());
+                        else
+                                show.setAvailableSeatCount(show.getAvailableSeatCount() - request.getBookedSeatCount());
+                        if (show.getAvailableSeatCount() == 0)
+                                show.setBookingStatus(BookingStatus.SOLD_OUT);
+                }
                 if (request.getShowName() != null)
                         show.setShowName(request.getShowName());
 
@@ -142,6 +156,40 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
                 showRepo.save(show);
         }
 
+        public void updateBookingStatus(
+                        ShowEntity show,
+                        BookingStatus newStatus) {
+
+                BookingStatus currentStatus = show.getBookingStatus();
+
+                // Rule 1: CANCELLED is terminal
+                if (currentStatus == BookingStatus.CANCELLED) {
+                        throw new InvalidBookingStatusTransitionException(
+                                        "Cancelled show cannot be modified. Delete and recreate the show.");
+                }
+
+                // Rule 2: Cannot transition TO NOT_STARTED
+                if (newStatus == BookingStatus.NOT_STARTED) {
+                        throw new InvalidBookingStatusTransitionException(
+                                        "Show cannot be moved back to NOT_STARTED state.");
+                }
+
+                // Rule 3: OPEN requires seat validation
+                if (newStatus == BookingStatus.OPEN) {
+
+                        if (show.getAvailableSeatCount() <= 0) {
+                                show.setBookingStatus(BookingStatus.SOLD_OUT);
+                                return;
+                        }
+
+                        show.setBookingStatus(BookingStatus.OPEN);
+                        return;
+                }
+
+                // Default valid transition
+                show.setBookingStatus(newStatus);
+        }
+
         public void delete(DeleteShow request) {
                 String userName = request.getUserName();
                 // 1️⃣ Validate user
@@ -160,7 +208,7 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
 
         public static Specification<ShowEntity> withFilters(
                         ReadShow r, UserEntity user) {
-
+                // 'cb' stands for criteria builder
                 return (root, query, cb) -> {
                         List<Predicate> predicates = new ArrayList<>();
 

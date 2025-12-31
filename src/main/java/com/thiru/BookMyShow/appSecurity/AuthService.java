@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.thiru.BookMyShow.userMgmt.UserEntity;
-import com.thiru.BookMyShow.userMgmt.UserLoginRequestDTO;
+import com.thiru.BookMyShow.userMgmt.DTO.UserLoginRequestDTO;
 
 import java.util.Date;
 import java.util.Base64;

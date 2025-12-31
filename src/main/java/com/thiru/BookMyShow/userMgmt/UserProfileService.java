@@ -5,6 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.thiru.BookMyShow.appSecurity.*;
+import com.thiru.BookMyShow.bookingMgmt.BookingService;
+import com.thiru.BookMyShow.bookingMgmt.DTO.*;
+import com.thiru.BookMyShow.userMgmt.DTO.UserLoginRequestDTO;
+import com.thiru.BookMyShow.userMgmt.DTO.UserProfileResponseDTO;
+import com.thiru.BookMyShow.userMgmt.DTO.UserSignupRequestDTO;
 
 import java.util.*;
 
@@ -14,6 +19,7 @@ public class UserProfileService {
 
     private final UserRepository userRepository;
     private final AuthService authService;
+    private final BookingService bookingService;
 
     public AuthResponseDTO login(UserLoginRequestDTO request) {
         if (request.getAuthType() == AuthType.BASIC) {
@@ -107,17 +113,12 @@ public class UserProfileService {
         UserEntity user = userRepository.findByName(userName)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<UserBookingSummaryDTO> bookingDtos = user.getBookings()
-                .stream()
-                .map(booking -> UserBookingSummaryDTO.builder()
-                        .bookingId(booking.getBookingId())
-                        .showId(booking.getShowSeat().getShow().getShowId())
-                        .eventId(booking.getShowSeat().getShow().getEvent().getEventId())
-                        .seatNo(booking.getShowSeat().getSeat().getSeatNo())
-                        .seatCategory(booking.getShowSeat().getCategory().getName())
-                        .build())
-                .toList();
-
+        // 🔹 Build ReadBookings filter using userName
+        ReadBookings readBookings = ReadBookings.builder()
+                .userName(userName)
+                .build();
+        // 🔹 Fetch booking DTOs
+        List<ReadBookingResponse> bookingDtos = bookingService.readBookings(readBookings);
         return UserProfileResponseDTO.builder()
                 .userId(user.getUserId())
                 .name(user.getName())

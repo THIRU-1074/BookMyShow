@@ -3,6 +3,9 @@ package com.thiru.BookMyShow.userMgmt;
 import org.springframework.web.bind.annotation.*;
 
 import com.thiru.BookMyShow.appSecurity.*;
+import com.thiru.BookMyShow.userMgmt.DTO.UserLoginRequestDTO;
+import com.thiru.BookMyShow.userMgmt.DTO.UserProfileResponseDTO;
+import com.thiru.BookMyShow.userMgmt.DTO.UserSignupRequestDTO;
 
 import org.springframework.http.*;
 import lombok.RequiredArgsConstructor;
