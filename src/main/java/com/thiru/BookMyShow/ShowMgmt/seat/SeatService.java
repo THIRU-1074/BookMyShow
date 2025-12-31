@@ -4,16 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.access.AccessDeniedException;
+import java.util.*;
+import jakarta.transaction.Transactional;
+
 import com.thiru.BookMyShow.exception.*;
 import com.thiru.BookMyShow.ShowMgmt.AuthorizationPolicy;
 import com.thiru.BookMyShow.ShowMgmt.auditorium.AuditoriumEntity;
 import com.thiru.BookMyShow.ShowMgmt.auditorium.AuditoriumRepository;
 import com.thiru.BookMyShow.ShowMgmt.seat.DTO.*;
 import com.thiru.BookMyShow.userMgmt.*;
-
-import org.springframework.security.access.AccessDeniedException;
-import java.util.*;
-import jakarta.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,16 +35,16 @@ public class SeatService implements AuthorizationPolicy<SeatEntity, UserEntity> 
                         throw new AccessDeniedException("Only Admin can update...!");
                 if (se.getAuditorium().getAdmin().getUserId().equals(ue.getUserId()))
                         return;
-                throw new AccessDeniedException("You could update your auditoriums...!");
+                throw new AccessDeniedException("You could update your auditorium's seats...!");
         }
 
         @Override
         public void canDelete(SeatEntity se, UserEntity ue) {
                 if (!ue.getRole().equals(Role.ADMIN))
-                        throw new AccessDeniedException("Only Admin can update...!");
+                        throw new AccessDeniedException("Only Admin can delete...!");
                 if (se.getAuditorium().getAdmin().getUserId().equals(ue.getUserId()))
                         return;
-                throw new AccessDeniedException("You could update your auditoriums...!");
+                throw new AccessDeniedException("You could only delete your auditorium's seats...!");
         }
 
         @Override

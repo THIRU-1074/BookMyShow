@@ -31,7 +31,4 @@ public class AuditoriumEntity {
     @ManyToOne
     @JoinColumn(name = "userId")
     private UserEntity admin;
-
-    @OneToMany(mappedBy = "auditorium")
-    private List<SeatEntity> seats;
 }

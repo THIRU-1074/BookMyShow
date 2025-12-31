@@ -1,6 +1,6 @@
 package com.thiru.BookMyShow.ShowMgmt.show;
 
-public enum BookingStatus {
+public enum ShowBookingStatus {
     NOT_STARTED,
     OPEN,
     PAUSED,

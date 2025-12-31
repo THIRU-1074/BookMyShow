@@ -4,6 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.AccessDeniedException;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.jpa.domain.Specification;
+
 import com.thiru.BookMyShow.exception.*;
 import com.thiru.BookMyShow.ShowMgmt.AuthorizationPolicy;
 import com.thiru.BookMyShow.ShowMgmt.auditorium.*;
@@ -13,10 +17,6 @@ import com.thiru.BookMyShow.ShowMgmt.seatCategory.SeatCategoryRepository;
 import com.thiru.BookMyShow.ShowMgmt.show.*;
 import com.thiru.BookMyShow.ShowMgmt.showSeat.DTO.*;
 import com.thiru.BookMyShow.userMgmt.*;
-
-import org.springframework.security.access.AccessDeniedException;
-import jakarta.persistence.criteria.Predicate;
-import org.springframework.data.jpa.domain.Specification;
 
 @Service
 @RequiredArgsConstructor
@@ -42,16 +42,16 @@ public class ShowSeatService implements AuthorizationPolicy<ShowEntity, UserEnti
             throw new AccessDeniedException("Only Admin can update...!");
         if (se.getEvent().getAdmin().getUserId().equals(ue.getUserId()))
             return;
-        throw new AccessDeniedException("You could update your auditoriums...!");
+        throw new AccessDeniedException("You could update your shows seats only...!");
     }
 
     @Override
     public void canDelete(ShowEntity se, UserEntity ue) {
         if (!ue.getRole().equals(Role.ADMIN))
-            throw new AccessDeniedException("Only Admin can update...!");
+            throw new AccessDeniedException("Only Admin can delete...!");
         if (se.getEvent().getAdmin().getUserId().equals(ue.getUserId()))
             return;
-        throw new AccessDeniedException("You could update your auditoriums...!");
+        throw new AccessDeniedException("You could delete your shows seats only...!");
     }
 
     @Override
@@ -89,14 +89,14 @@ public class ShowSeatService implements AuthorizationPolicy<ShowEntity, UserEnti
         // 5️⃣ Create ShowSeat entries
         SeatCategoryEntity seatCategory = seatCategoryRepo.findByName("REGULAR")
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Show not found with id " + showId));
+                        "Seat Category not dound...! " + showId));
         List<ShowSeatEntity> showSeats = seats.stream()
                 .map(seat -> {
                     ShowSeatEntity ss = new ShowSeatEntity();
                     ss.setShow(show);
                     ss.setSeat(seat);
-                    ss.setCategory(seatCategory);
-                    ss.setStatus(SeatAvailabilityStatus.LOCKED);
+                    ss.setShowSeatCategory(seatCategory);
+                    ss.setShowSeatAvailabilityStatus(SeatAvailabilityStatus.LOCKED);
                     return ss;
                 })
                 .toList();
@@ -108,7 +108,7 @@ public class ShowSeatService implements AuthorizationPolicy<ShowEntity, UserEnti
     public void update(UpdateShowSeats request) {
 
         // 1️⃣ Load user
-        UserEntity user = userRepo.findByName(request.getUserName())
+        UserEntity user = userRepo.findByUserName(request.getUserName())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // 2️⃣ Load show
@@ -116,13 +116,7 @@ public class ShowSeatService implements AuthorizationPolicy<ShowEntity, UserEnti
                 .orElseThrow(() -> new ResourceNotFoundException("Show not found"));
 
         // 3️⃣ Authorization: show → event → admin must be ADMIN
-        if (user.getRole() != Role.ADMIN ||
-                !show.getEvent().getAdmin().getUserId()
-                        .equals(user.getUserId())) {
-
-            throw new AccessDeniedException(
-                    "Only event admin can update show seats");
-        }
+        this.canUpdate(show, user);
 
         // 4️⃣ Iterate seat updates
         for (UpdateShowSeat seatUpdate : request.getSeats()) {
@@ -139,11 +133,11 @@ public class ShowSeatService implements AuthorizationPolicy<ShowEntity, UserEnti
             // 5️⃣ Partial updates (ONLY non-null fields)
 
             if (seatUpdate.getCategory() != null) {
-                showSeat.setCategory(seatUpdate.getCategory());
+                showSeat.setShowSeatCategory(seatUpdate.getCategory());
             }
 
             if (seatUpdate.getStatus() != null) {
-                showSeat.setStatus(seatUpdate.getStatus());
+                showSeat.setShowSeatAvailabilityStatus(seatUpdate.getStatus());
             }
         }
 
@@ -203,8 +197,8 @@ public class ShowSeatService implements AuthorizationPolicy<ShowEntity, UserEnti
                 .showSeatId(ss.getShowSeatId())
                 .seatId(ss.getSeat().getSeatId())
                 .seatNo(ss.getSeat().getSeatNo())
-                .category(ss.getCategory())
-                .status(ss.getStatus())
+                .category(ss.getShowSeatCategory())
+                .status(ss.getShowSeatAvailabilityStatus())
                 .build();
     }
 }

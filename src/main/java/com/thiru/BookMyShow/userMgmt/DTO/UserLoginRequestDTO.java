@@ -10,11 +10,8 @@ public class UserLoginRequestDTO {
 
     private String userName;
 
-    // Used only for BASIC auth
-    private String password;
-
-    // Used only for JWT auth
-    private String accessToken;
+    // In Bearer its RefreshToken
+    private String credential;
 
     private AuthType authType;
 }

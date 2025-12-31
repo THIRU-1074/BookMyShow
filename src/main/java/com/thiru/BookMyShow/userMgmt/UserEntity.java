@@ -2,7 +2,6 @@ package com.thiru.BookMyShow.userMgmt;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.List;
 
 import com.thiru.BookMyShow.bookingMgmt.BookingEntity;
@@ -18,24 +17,20 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "userId")
     private Long userId;
 
     @Setter(AccessLevel.NONE)
-    @Column(name = "hashed_pwd", nullable = false)
+    @Column(name = "hashedPwd", nullable = false)
     private String hashedPwd;
 
-    public void updatePassword(String hashedPwd) {
-        this.hashedPwd = hashedPwd;
-    }
+    @Column(name = "userName", nullable = false)
+    private String userName;
 
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @Column(name = "mail_id", nullable = false, unique = true)
+    @Column(name = "mailId", nullable = false, unique = true)
     private String mailId;
 
-    @Column(name = "ph_no", nullable = false, unique = true)
+    @Column(name = "phNo", nullable = false, unique = true)
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
@@ -45,16 +40,3 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<BookingEntity> bookings;
 }
-
-/*
- * EXAMPLE UAGE
- * 
- * UserEntity user = UserEntity.builder()
- * .name("Thiru")
- * .mailId("thiru@mail.com")
- * .phoneNumber("9876543210")
- * .hashedPwd(passwordEncoder.encode("secret"))
- * .role(Role.USER)
- * .build();
- * 
- */

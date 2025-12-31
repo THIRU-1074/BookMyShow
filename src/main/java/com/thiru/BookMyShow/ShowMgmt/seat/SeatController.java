@@ -1,14 +1,13 @@
 package com.thiru.BookMyShow.ShowMgmt.seat;
 
+import io.jsonwebtoken.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import com.thiru.BookMyShow.ShowMgmt.seat.DTO.*;
-
 import org.springframework.http.*;
 import lombok.RequiredArgsConstructor;
-import io.jsonwebtoken.*;
 import java.util.*;
+
+import com.thiru.BookMyShow.ShowMgmt.seat.DTO.*;
 
 @RestController
 @RequestMapping("/seat")

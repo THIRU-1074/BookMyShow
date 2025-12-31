@@ -7,9 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 public class ReadEvent {
-    private String eventType;
-
-    private EventType eventTypeEnum;
+    private EventType eventType;
 
     private String eventName;
 

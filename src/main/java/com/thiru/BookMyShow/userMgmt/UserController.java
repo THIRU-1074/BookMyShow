@@ -1,17 +1,17 @@
 package com.thiru.BookMyShow.userMgmt;
 
 import org.springframework.web.bind.annotation.*;
-
-import com.thiru.BookMyShow.appSecurity.*;
-import com.thiru.BookMyShow.userMgmt.DTO.UserLoginRequestDTO;
-import com.thiru.BookMyShow.userMgmt.DTO.UserProfileResponseDTO;
-import com.thiru.BookMyShow.userMgmt.DTO.UserSignupRequestDTO;
-
 import org.springframework.http.*;
 import lombok.RequiredArgsConstructor;
 import io.jsonwebtoken.*;
 import org.springframework.security.core.Authentication;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+import com.thiru.BookMyShow.appSecurity.*;
+import com.thiru.BookMyShow.userMgmt.DTO.UserLoginRequestDTO;
+import com.thiru.BookMyShow.userMgmt.DTO.UserProfileResponseDTO;
+import com.thiru.BookMyShow.userMgmt.DTO.UserSignupRequestDTO;
 
 @RestController
 @RequestMapping("/users")
@@ -29,6 +29,7 @@ public class UserController {
         return ResponseEntity.ok("User registered successfully");
     }
 
+    @SecurityRequirement(name = "basicAuth")
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorizationHeader) {
@@ -43,7 +44,7 @@ public class UserController {
     @PatchMapping("/updateProfile")
     public ResponseEntity<?> updateUserProfile(Authentication authentication) {
         // Update the fields available in Request Body
-        return getUserProfile(authentication);
+        return ResponseEntity.ok(getUserProfile(authentication));
     }
 
     @GetMapping("/profile")

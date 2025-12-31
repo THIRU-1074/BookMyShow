@@ -33,5 +33,5 @@ public class UpdateShow {
 
     private Long BookedSeatCount;
 
-    private BookingStatus bookingStatus;
+    private ShowBookingStatus bookingStatus;
 }

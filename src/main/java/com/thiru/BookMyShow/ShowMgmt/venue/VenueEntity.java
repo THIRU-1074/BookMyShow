@@ -1,11 +1,10 @@
 package com.thiru.BookMyShow.ShowMgmt.venue;
 
+import jakarta.persistence.*;
+import lombok.*;
 import java.util.*;
 
 import com.thiru.BookMyShow.ShowMgmt.auditorium.AuditoriumEntity;
-
-import jakarta.persistence.*;
-import lombok.*;
 
 @Entity
 @Table(name = "venues")

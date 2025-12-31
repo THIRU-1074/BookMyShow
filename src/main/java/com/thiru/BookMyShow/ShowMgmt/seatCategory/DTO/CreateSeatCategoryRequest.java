@@ -13,6 +13,9 @@ public class CreateSeatCategoryRequest {
     @Size(max = 50)
     private String name;
 
+    @NotBlank(message = "UserName is required")
+    String userName;
+
     @Size(max = 255)
     private String description;
 }

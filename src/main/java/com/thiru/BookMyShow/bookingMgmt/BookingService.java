@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 import com.thiru.BookMyShow.exception.*;
+import com.thiru.BookMyShow.paymentGateWay.PaymentGateway;
 import com.thiru.BookMyShow.ShowMgmt.showSeat.*;
 import com.thiru.BookMyShow.ShowMgmt.show.*;
 import com.thiru.BookMyShow.bookingMgmt.DTO.*;
@@ -23,6 +24,7 @@ import com.thiru.BookMyShow.ShowMgmt.venue.DTO.*;
 import com.thiru.BookMyShow.ShowMgmt.seat.*;
 import com.thiru.BookMyShow.ShowMgmt.seat.DTO.*;
 import com.thiru.BookMyShow.ShowMgmt.showSeatPricing.*;
+import com.thiru.BookMyShow.ShowMgmt.seatCategory.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,66 +36,108 @@ public class BookingService {
         private final ShowSeatPricingRepository showSeatPricingRepo;
         private final VenueService venueService;
         private final SeatService seatService;
+        private final PaymentGateway paymentGateway;
+        private final ShowSeatPricingRepository pricingRepo;
 
         public void createBookings(CreateBookings req) {
-                UserEntity user = userRepo.findByName(req.getUserName())
+                UserEntity user = userRepo.findByUserName(req.getUserName())
                                 .orElseThrow(() -> new ResponseStatusException(
-                                                HttpStatus.NOT_FOUND,
-                                                "User not found: " + req.getUserName()));
+                                                HttpStatus.NOT_FOUND, "User not found"));
+
                 if (user.getRole().equals(Role.ADMIN))
-                        throw new AccessDeniedException("Only Users can book..!");
-                for (CreateBooking cb : req.getBookings())
-                        createBooking(cb, user);
+                        throw new AccessDeniedException("Only Users can book");
+
+                List<BookingEntity> bookings = new ArrayList<>();
+
+                for (CreateBooking cb : req.getBookings()) {
+                        bookings.add(prepareBooking(cb, user));
+                }
+
+                // 💳 PAYMENT STEP (outside DB writes but inside TX)
+                boolean paymentSuccess = paymentGateway.charge(
+                                user,
+                                bookings.size(),
+                                calculateAmount(bookings));
+
+                if (!paymentSuccess) {
+                        throw new PaymentFailedException("Payment failed");
+                }
+
+                // 🎯 FINALIZE BOOKINGS
+                bookings.forEach(this::finalizeBooking);
         }
 
-        public void createBooking(CreateBooking req, UserEntity user) {
+        public BookingEntity prepareBooking(CreateBooking req, UserEntity user) {
 
-                // 1️⃣ DB lock seat
+                // DB-level lock
                 ShowSeatEntity seat = showSeatRepo.lockById(req.getSeatId())
                                 .orElseThrow(() -> new EntityNotFoundException("Seat not found"));
 
-                // 2️⃣ Business lock validation
-                if (seat.getStatus() != SeatAvailabilityStatus.AVAILABLE) {
+                if (seat.getShowSeatAvailabilityStatus() != SeatAvailabilityStatus.AVAILABLE) {
                         throw new IllegalStateException("Seat not available");
                 }
 
                 ShowEntity show = seat.getShow();
 
-                // 3️⃣ Check show booking status
-                if (show.getBookingStatus() != BookingStatus.OPEN) {
-                        throw new IllegalStateException("Show booking is not open");
+                if (show.getBookingStatus() != ShowBookingStatus.OPEN) {
+                        throw new IllegalStateException("Show booking closed");
                 }
 
-                // 4️⃣ Lock seat (business)
-                seat.setStatus(SeatAvailabilityStatus.LOCKED);
-
-                // 5️⃣ Reduce availability
                 if (show.getAvailableSeatCount() <= 0) {
                         throw new IllegalStateException("No seats available");
                 }
 
-                show.setAvailableSeatCount(
-                                show.getAvailableSeatCount() - 1);
+                // Business lock
+                seat.setShowSeatAvailabilityStatus(SeatAvailabilityStatus.LOCKED);
+                show.setAvailableSeatCount(show.getAvailableSeatCount() - 1);
 
-                // 6️⃣ Create booking
                 BookingEntity booking = new BookingEntity();
                 booking.setUser(user);
                 booking.setShowSeat(seat);
                 booking.setBookingTime(LocalDateTime.now());
+                booking.setTicketBookingStatus(TicketBookingStatus.PENDING_PAYMENT);
 
-                bookingRepo.save(booking);
+                return bookingRepo.save(booking);
+        }
 
-                // 7️⃣ Finalize seat
-                seat.setStatus(SeatAvailabilityStatus.BOOKED);
+        public void finalizeBooking(BookingEntity booking) {
+
+                ShowSeatEntity seat = booking.getShowSeat();
+                ShowEntity show = seat.getShow();
+
+                seat.setShowSeatAvailabilityStatus(SeatAvailabilityStatus.BOOKED);
+                booking.setTicketBookingStatus(TicketBookingStatus.CONFIRMED);
 
                 if (show.getAvailableSeatCount() == 0) {
-                        show.setBookingStatus(BookingStatus.SOLD_OUT);
+                        show.setBookingStatus(ShowBookingStatus.SOLD_OUT);
+                }
+        }
+
+        public Double calculateAmount(List<BookingEntity> bookings) {
+
+                Double total = (double) 0;
+
+                for (BookingEntity booking : bookings) {
+
+                        ShowSeatEntity seat = booking.getShowSeat();
+                        ShowEntity show = seat.getShow();
+                        SeatCategoryEntity category = seat.getShowSeatCategory();
+
+                        ShowSeatPricingEntity pricing = pricingRepo.findByShowAndSeatCategory(show, category)
+                                        .orElseThrow(() -> new IllegalStateException(
+                                                        "Pricing not configured for showId="
+                                                                        + show.getShowId()
+                                                                        + ", seatCategory="
+                                                                        + category.getName()));
+
+                        total = total + (Double.valueOf(pricing.getPrice()));
                 }
 
+                return total;
         }
 
         public void deleteBookings(DeleteBookings request) {
-                UserEntity user = userRepo.findByName(request.getUserName())
+                UserEntity user = userRepo.findByUserName(request.getUserName())
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
                                                 "User not found: " + request.getUserName()));
@@ -111,7 +155,7 @@ public class BookingService {
                 ShowSeatEntity seat = booking.getShowSeat();
                 ShowEntity show = seat.getShow();
 
-                seat.setStatus(SeatAvailabilityStatus.AVAILABLE);
+                seat.setShowSeatAvailabilityStatus(SeatAvailabilityStatus.AVAILABLE);
                 show.setAvailableSeatCount(show.getAvailableSeatCount() + 1);
 
                 bookingRepo.delete(booking);
@@ -201,12 +245,12 @@ public class BookingService {
                 ShowSeatPricingEntity pricing = showSeatPricingRepo
                                 .findByShow_ShowIdAndSeatCategory_Id(
                                                 show.getShowId(),
-                                                seat.getCategory().getId())
+                                                seat.getShowSeatCategory().getId())
                                 .orElseThrow(() -> new EntityNotFoundException(
                                                 "Pricing not configured for show "
                                                                 + show.getShowId()
                                                                 + " and seat category "
-                                                                + seat.getCategory().getName()));
+                                                                + seat.getShowSeatCategory().getName()));
 
                 return ReadBookingResponse.builder()
                                 // Booking
@@ -226,7 +270,7 @@ public class BookingService {
 
                                 // Seat
                                 .seat(seatResponse)
-                                .seatCategory(seat.getCategory().getName())
+                                .seatCategory(seat.getShowSeatCategory().getName())
                                 .price(pricing.getPrice().doubleValue())
 
                                 // Show

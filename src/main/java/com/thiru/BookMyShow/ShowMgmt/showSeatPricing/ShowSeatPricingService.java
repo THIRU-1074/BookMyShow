@@ -35,7 +35,7 @@ public class ShowSeatPricingService implements AuthorizationPolicy<ShowSeatPrici
 
         @Override
         public void canUpdate(ShowSeatPricingEntity se, UserEntity ue) {
-                return;
+                throw new AccessDeniedException("Showsheat Pricing cannot be updated...");
         }
 
         @Override
@@ -44,7 +44,6 @@ public class ShowSeatPricingService implements AuthorizationPolicy<ShowSeatPrici
                         throw new AccessDeniedException("Only Admin can update...!");
                 if (se.getShow().getEvent().getAdmin().getUserId().equals(ue.getUserId()))
                         return;
-                throw new AccessDeniedException("You could update your auditoriums...!");
         }
 
         @Override
@@ -55,7 +54,7 @@ public class ShowSeatPricingService implements AuthorizationPolicy<ShowSeatPrici
         @Transactional
         public Long createPricing(CreateShowSeatPricing request) {
                 String userName = request.getUserName();
-                UserEntity ue = userRepo.findByName(userName)
+                UserEntity ue = userRepo.findByUserName(userName)
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
                                                 "User not found: " + userName));
@@ -80,12 +79,12 @@ public class ShowSeatPricingService implements AuthorizationPolicy<ShowSeatPrici
                                 .price(request.getPrice())
                                 .build();
 
-                return showSeatPricingRepo.save(pricing).getId();
+                return showSeatPricingRepo.save(pricing).getShowSeatPricingId();
         }
 
         @Transactional
         public void deletePricing(Long pricingId, String userName) {
-                UserEntity ue = userRepo.findByName(userName)
+                UserEntity ue = userRepo.findByUserName(userName)
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
                                                 "User not found: " + userName));

@@ -13,6 +13,7 @@ public class CreateSeat {
     @NotNull(message = "col is required")
     private Integer col;
 
+    @NotNull(message = "Required Stance or Section number...!")
     private Integer stance;
 
     private String seatNo;

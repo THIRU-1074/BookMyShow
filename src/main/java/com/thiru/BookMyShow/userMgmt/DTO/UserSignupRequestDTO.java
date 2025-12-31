@@ -3,7 +3,7 @@ package com.thiru.BookMyShow.userMgmt.DTO;
 import com.thiru.BookMyShow.userMgmt.Role;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,9 +22,7 @@ public class UserSignupRequestDTO {
     @NotBlank
     private String phoneNumber;
 
-    @NotBlank
-    private String role;
-
+    @NotNull
     private Role roleEnum;
 
     @NotBlank

@@ -5,7 +5,6 @@ import lombok.*;
 @Getter
 @Setter
 public class ReadShowSeatPricing {
-    private Long id;
+    private Long showSeatPricingId;
     private Long showId;
-    private String seatCategoryName;
 }

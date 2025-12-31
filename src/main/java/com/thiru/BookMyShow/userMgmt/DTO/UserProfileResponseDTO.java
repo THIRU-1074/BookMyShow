@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import java.util.List;
 import com.thiru.BookMyShow.bookingMgmt.DTO.*;
+import com.thiru.BookMyShow.userMgmt.*;
 
 @Getter
 @Builder
@@ -13,6 +14,6 @@ public class UserProfileResponseDTO {
     private String name;
     private String mailId;
     private String phoneNumber;
-    private String role;
+    private Role role;
     private List<ReadBookingResponse> bookings;
 }

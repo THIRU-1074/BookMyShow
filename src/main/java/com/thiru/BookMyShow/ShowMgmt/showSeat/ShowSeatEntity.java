@@ -30,9 +30,9 @@ public class ShowSeatEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "categoryId", nullable = false)
-    private SeatCategoryEntity category;
+    private SeatCategoryEntity showSeatCategory;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SeatAvailabilityStatus status;
+    private SeatAvailabilityStatus showSeatAvailabilityStatus;
 }

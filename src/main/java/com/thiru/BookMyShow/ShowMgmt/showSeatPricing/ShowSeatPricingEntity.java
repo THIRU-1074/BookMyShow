@@ -2,6 +2,7 @@ package com.thiru.BookMyShow.ShowMgmt.showSeatPricing;
 
 import lombok.*;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 
 import com.thiru.BookMyShow.ShowMgmt.seatCategory.*;
 import com.thiru.BookMyShow.ShowMgmt.show.*;
@@ -19,18 +20,19 @@ public class ShowSeatPricingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long showSeatPricingId;
 
     // Many prices belong to one show
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "show_id", nullable = false)
+    @JoinColumn(name = "showId", nullable = false)
     private ShowEntity show;
 
     // Many prices belong to one seat category
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "seat_category_id", nullable = false)
+    @JoinColumn(name = "seatCategoryId", nullable = false)
     private SeatCategoryEntity seatCategory;
 
+    @Positive
     @Column(nullable = false)
     private Double price;
 }

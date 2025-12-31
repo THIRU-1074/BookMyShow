@@ -6,13 +6,13 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.*;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 
 import com.thiru.BookMyShow.exception.*;
 import com.thiru.BookMyShow.ShowMgmt.AuthorizationPolicy;
 import com.thiru.BookMyShow.ShowMgmt.venue.DTO.*;
 import com.thiru.BookMyShow.userMgmt.*;
-
-import org.springframework.http.HttpStatus;
 
 @Service
 @RequiredArgsConstructor
@@ -22,17 +22,19 @@ public class VenueService implements AuthorizationPolicy<VenueEntity, UserEntity
 
     @Override
     public void canCreate(UserEntity ue) {
-
+        if (ue.getRole().equals(Role.ADMIN))
+            return;
+        throw new AccessDeniedException("Only Admin can create...!");
     }
 
     @Override
     public void canUpdate(VenueEntity ve, UserEntity ue) {
-
+        throw new AccessDeniedException("Cannot update Venue...!");
     }
 
     @Override
     public void canDelete(VenueEntity ve, UserEntity ue) {
-
+        return;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class VenueService implements AuthorizationPolicy<VenueEntity, UserEntity
     public void create(CreateVenue venue) {
         String userName = venue.getUserName();
         // 1️⃣ Validate user
-        UserEntity user = userRepo.findByName(userName)
+        UserEntity user = userRepo.findByUserName(userName)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "User not found: " + userName));

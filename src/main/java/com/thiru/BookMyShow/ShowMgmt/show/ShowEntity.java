@@ -1,14 +1,13 @@
 package com.thiru.BookMyShow.ShowMgmt.show;
 
 import java.util.*;
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDateTime;
 
 import com.thiru.BookMyShow.ShowMgmt.auditorium.AuditoriumEntity;
 import com.thiru.BookMyShow.ShowMgmt.event.EventEntity;
 import com.thiru.BookMyShow.ShowMgmt.event.Genre;
-
-import jakarta.persistence.*;
-import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "shows")
@@ -52,7 +51,7 @@ public class ShowEntity {
     private AuditoriumEntity auditorium;
 
     @Enumerated(EnumType.STRING)
-    private BookingStatus bookingStatus;
+    private ShowBookingStatus bookingStatus;
 
     private Long availableSeatCount;
 

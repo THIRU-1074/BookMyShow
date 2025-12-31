@@ -3,6 +3,7 @@ package com.thiru.BookMyShow.userMgmt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.*;
 
 import com.thiru.BookMyShow.appSecurity.*;
 import com.thiru.BookMyShow.bookingMgmt.BookingService;
@@ -10,8 +11,6 @@ import com.thiru.BookMyShow.bookingMgmt.DTO.*;
 import com.thiru.BookMyShow.userMgmt.DTO.UserLoginRequestDTO;
 import com.thiru.BookMyShow.userMgmt.DTO.UserProfileResponseDTO;
 import com.thiru.BookMyShow.userMgmt.DTO.UserSignupRequestDTO;
-
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +22,7 @@ public class UserProfileService {
 
     public AuthResponseDTO login(UserLoginRequestDTO request) {
         if (request.getAuthType() == AuthType.BASIC) {
-            UserEntity user = userRepository.findByName(request.getUserName())
+            UserEntity user = userRepository.findByUserName(request.getUserName())
                     .orElseThrow(() -> new RuntimeException("Invalid credentials"));
             return handleBasicLogin(request, user);
         }
@@ -38,7 +37,7 @@ public class UserProfileService {
     private AuthResponseDTO handleBasicLogin(UserLoginRequestDTO request, UserEntity user) {
 
         boolean valid = authService.verifyPassword(
-                request.getPassword(),
+                request.getCredential(),
                 user.getHashedPwd());
 
         if (!valid) {
@@ -55,21 +54,20 @@ public class UserProfileService {
                 .build();
 
         return response;
-        // return json of both
     }
 
     private AuthResponseDTO handleJwtLogin(UserLoginRequestDTO request) {
 
-        if (authService.isTokenExpired(request.getPassword())) {
+        if (authService.isTokenExpired(request.getCredential())) {
             throw new RuntimeException("401 UNAUTHORIZED - Token expired");
         }
 
-        if (!authService.isTokenValid(request.getPassword())) {
+        if (!authService.isTokenValid(request.getCredential())) {
             throw new RuntimeException("401 UNAUTHORIZED - Invalid token");
         }
 
         // Generate both tokens
-        String rtoken = request.getPassword();
+        String rtoken = request.getCredential();
         String atoken = authService.generateAccessToken(rtoken);
 
         AuthResponseDTO response = AuthResponseDTO.builder()
@@ -82,10 +80,6 @@ public class UserProfileService {
 
     @Transactional
     public void signup(UserSignupRequestDTO request) {
-        if (request.getRole().equals("ADMIN"))
-            request.setRoleEnum(Role.ADMIN);
-        else if (request.getRole().equals("USER"))
-            request.setRoleEnum(Role.USER);
         // 1️⃣ Validate uniqueness
         if (userRepository.existsByMailId(request.getMailId())) {
             throw new IllegalArgumentException("Email already registered");
@@ -97,7 +91,7 @@ public class UserProfileService {
 
         // 2️⃣ Map DTO → Entity
         UserEntity user = UserEntity.builder()
-                .name(request.getName())
+                .userName(request.getName())
                 .mailId(request.getMailId())
                 .phoneNumber(request.getPhoneNumber())
                 .hashedPwd(authService.hash(request.getPassword()))
@@ -110,21 +104,23 @@ public class UserProfileService {
 
     public UserProfileResponseDTO getUserProfile(String userName) {
 
-        UserEntity user = userRepository.findByName(userName)
+        UserEntity user = userRepository.findByUserName(userName)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // 🔹 Build ReadBookings filter using userName
         ReadBookings readBookings = ReadBookings.builder()
                 .userName(userName)
                 .build();
+
         // 🔹 Fetch booking DTOs
         List<ReadBookingResponse> bookingDtos = bookingService.readBookings(readBookings);
+
         return UserProfileResponseDTO.builder()
                 .userId(user.getUserId())
-                .name(user.getName())
+                .name(user.getUserName())
                 .mailId(user.getMailId())
                 .phoneNumber(user.getPhoneNumber())
-                .role(user.getRole().name())
+                .role(user.getRole())
                 .bookings(bookingDtos)
                 .build();
     }

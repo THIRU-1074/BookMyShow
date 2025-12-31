@@ -3,7 +3,6 @@ package com.thiru.BookMyShow.bookingMgmt;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
-
 import com.thiru.BookMyShow.ShowMgmt.showSeat.ShowSeatEntity;
 import com.thiru.BookMyShow.userMgmt.UserEntity;
 
@@ -31,5 +30,8 @@ public class BookingEntity {
 
     @Column(name = "bookingTime", nullable = false)
     private LocalDateTime bookingTime;
+
+    @Enumerated(EnumType.STRING)
+    private TicketBookingStatus ticketBookingStatus;
 
 }

@@ -2,13 +2,12 @@ package com.thiru.BookMyShow.ShowMgmt.event;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import com.thiru.BookMyShow.ShowMgmt.event.DTO.*;
-
 import org.springframework.http.*;
 import lombok.RequiredArgsConstructor;
 import io.jsonwebtoken.*;
 import java.util.*;
+
+import com.thiru.BookMyShow.ShowMgmt.event.DTO.*;
 
 @RestController
 @RequestMapping("/event")

@@ -11,9 +11,7 @@ public class UpdateEvent {
     @NotBlank(message = "event Id is required to update")
     private Long eventId;
 
-    private String eventType;
-
-    private EventType eventTypeEnum;
+    private EventType eventType;
 
     private String eventName;
 

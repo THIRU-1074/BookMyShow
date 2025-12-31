@@ -12,5 +12,6 @@ public class updateAuditorium {
     @NotBlank(message = "Auditorium Id is required")
     private Long auditoriumId;
 
+    @NotBlank(message = "UserName is required")
     private String userName;
 }

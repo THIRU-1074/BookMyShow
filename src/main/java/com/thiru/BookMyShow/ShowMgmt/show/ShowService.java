@@ -43,16 +43,16 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
                         throw new AccessDeniedException("Only Admin can update...!");
                 if (se.getEvent().getAdmin().getUserId().equals(ue.getUserId()))
                         return;
-                throw new AccessDeniedException("You could update your auditoriums...!");
+                throw new AccessDeniedException("You could update your shows...!");
         }
 
         @Override
         public void canDelete(ShowEntity se, UserEntity ue) {
                 if (!ue.getRole().equals(Role.ADMIN))
-                        throw new AccessDeniedException("Only Admin can update...!");
+                        throw new AccessDeniedException("Only Admin can delete...!");
                 if (se.getEvent().getAdmin().getUserId().equals(ue.getUserId()))
                         return;
-                throw new AccessDeniedException("You could update your auditoriums...!");
+                throw new AccessDeniedException("You could delete your shows...!");
         }
 
         @Override
@@ -63,7 +63,7 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
         public void create(CreateShow show) {
                 // 1️⃣ Validate Event existence
                 String userName = show.getUserName();
-                UserEntity ue = userRepo.findByName(userName)
+                UserEntity ue = userRepo.findByUserName(userName)
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
                                                 "User not found: " + userName));
@@ -85,7 +85,7 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
                                 .auditorium(auditorium)
                                 .showName(show.getShowName())
                                 .availableSeatCount(seatCount)
-                                .bookingStatus(BookingStatus.NOT_STARTED)
+                                .bookingStatus(ShowBookingStatus.NOT_STARTED)
                                 .showDateTime(show.getShowDateTime())
                                 .durationMinutes(show.getDurationMinutes())
                                 .genres(show.getGenres())
@@ -102,7 +102,7 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
 
         public void update(UpdateShow request) {
                 // 1️⃣ Load user
-                UserEntity user = userRepo.findByName(request.getUserName())
+                UserEntity user = userRepo.findByUserName(request.getUserName())
                                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
                 // 2️⃣ Load show
@@ -122,7 +122,7 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
                         else
                                 show.setAvailableSeatCount(show.getAvailableSeatCount() - request.getBookedSeatCount());
                         if (show.getAvailableSeatCount() == 0)
-                                show.setBookingStatus(BookingStatus.SOLD_OUT);
+                                show.setBookingStatus(ShowBookingStatus.SOLD_OUT);
                 }
                 if (request.getShowName() != null)
                         show.setShowName(request.getShowName());
@@ -158,31 +158,31 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
 
         public void updateBookingStatus(
                         ShowEntity show,
-                        BookingStatus newStatus) {
+                        ShowBookingStatus newStatus) {
 
-                BookingStatus currentStatus = show.getBookingStatus();
+                ShowBookingStatus currentStatus = show.getBookingStatus();
 
                 // Rule 1: CANCELLED is terminal
-                if (currentStatus == BookingStatus.CANCELLED) {
+                if (currentStatus == ShowBookingStatus.CANCELLED) {
                         throw new InvalidBookingStatusTransitionException(
                                         "Cancelled show cannot be modified. Delete and recreate the show.");
                 }
 
                 // Rule 2: Cannot transition TO NOT_STARTED
-                if (newStatus == BookingStatus.NOT_STARTED) {
+                if (newStatus == ShowBookingStatus.NOT_STARTED) {
                         throw new InvalidBookingStatusTransitionException(
                                         "Show cannot be moved back to NOT_STARTED state.");
                 }
 
                 // Rule 3: OPEN requires seat validation
-                if (newStatus == BookingStatus.OPEN) {
+                if (newStatus == ShowBookingStatus.OPEN) {
 
                         if (show.getAvailableSeatCount() <= 0) {
-                                show.setBookingStatus(BookingStatus.SOLD_OUT);
+                                show.setBookingStatus(ShowBookingStatus.SOLD_OUT);
                                 return;
                         }
 
-                        show.setBookingStatus(BookingStatus.OPEN);
+                        show.setBookingStatus(ShowBookingStatus.OPEN);
                         return;
                 }
 
@@ -193,7 +193,7 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
         public void delete(DeleteShow request) {
                 String userName = request.getUserName();
                 // 1️⃣ Validate user
-                UserEntity user = userRepo.findByName(userName)
+                UserEntity user = userRepo.findByUserName(userName)
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
                                                 "User not found: " + userName));
@@ -250,7 +250,7 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
         public List<ShowReadResponse> read(ReadShow request) {
                 this.canRead(null, null);
                 // 1️⃣ Load user
-                UserEntity user = userRepo.findByName(request.getUserName())
+                UserEntity user = userRepo.findByUserName(request.getUserName())
                                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
                 // 2️⃣ If showId → single read
@@ -259,7 +259,7 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
                         ShowEntity show = showRepo.findById(request.getShowId())
                                         .orElseThrow(() -> new ResourceNotFoundException("Show not found"));
 
-                        canRead(show, user); // already implemented by you
+                        canRead(show, user);
 
                         return List.of(toResponse(show));
                 }

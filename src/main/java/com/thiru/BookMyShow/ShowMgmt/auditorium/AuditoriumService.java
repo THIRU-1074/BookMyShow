@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.access.AccessDeniedException;
+import java.util.*;
 
 import com.thiru.BookMyShow.ShowMgmt.AuthorizationPolicy;
 import com.thiru.BookMyShow.ShowMgmt.auditorium.DTO.*;
@@ -12,9 +14,6 @@ import com.thiru.BookMyShow.ShowMgmt.venue.VenueRepository;
 import com.thiru.BookMyShow.userMgmt.Role;
 import com.thiru.BookMyShow.userMgmt.UserEntity;
 import com.thiru.BookMyShow.userMgmt.UserRepository;
-
-import org.springframework.security.access.AccessDeniedException;
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +35,7 @@ public class AuditoriumService implements AuthorizationPolicy<AuditoriumEntity, 
             throw new AccessDeniedException("Only Admin can update...!");
         if (ae.getAdmin().getUserId().equals(ue.getUserId()))
             return;
-        throw new AccessDeniedException("You could update your auditoriums...!");
+        throw new AccessDeniedException("You could update your auditoriums only...!");
     }
 
     @Override
@@ -45,7 +44,7 @@ public class AuditoriumService implements AuthorizationPolicy<AuditoriumEntity, 
             throw new AccessDeniedException("Only Admin can delete...!");
         if (ae.getAdmin().getUserId().equals(ue.getUserId()))
             return;
-        throw new AccessDeniedException("You could delete your auditoriums...!");
+        throw new AccessDeniedException("You could delete your auditoriums only...!");
     }
 
     @Override
@@ -54,12 +53,12 @@ public class AuditoriumService implements AuthorizationPolicy<AuditoriumEntity, 
             throw new AccessDeniedException("Only Admin can read...!");
         if (ae.getAdmin().getUserId().equals(ue.getUserId()))
             return;
-        throw new AccessDeniedException("You could read your auditoriums...!");
+        throw new AccessDeniedException("You could read your auditoriums only...!");
     }
 
     public void create(createAuditorium auditorium) {
         String userName = auditorium.getUserName();
-        UserEntity ue = userRepo.findByName(userName)
+        UserEntity ue = userRepo.findByUserName(userName)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "User not found: " + userName));
@@ -85,7 +84,7 @@ public class AuditoriumService implements AuthorizationPolicy<AuditoriumEntity, 
     public void update(updateAuditorium auditorium) {
         String userName = auditorium.getUserName();
         // 1️⃣ Validate user
-        UserEntity user = userRepo.findByName(userName)
+        UserEntity user = userRepo.findByUserName(userName)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "User not found: " + userName));
@@ -109,7 +108,7 @@ public class AuditoriumService implements AuthorizationPolicy<AuditoriumEntity, 
     public void delete(deleteAuditorium auditorium) {
         String userName = auditorium.getUserName();
         // 1️⃣ Validate user
-        UserEntity user = userRepo.findByName(userName)
+        UserEntity user = userRepo.findByUserName(userName)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "User not found: " + userName));
@@ -133,7 +132,7 @@ public class AuditoriumService implements AuthorizationPolicy<AuditoriumEntity, 
 
         UserEntity user = null;
         if (request.getUserName() != null) {
-            user = userRepo.findByName(request.getUserName())
+            user = userRepo.findByUserName(request.getUserName())
                     .orElseThrow(() -> new ResponseStatusException(
                             HttpStatus.NOT_FOUND,
                             "User not found: " + request.getUserName()));

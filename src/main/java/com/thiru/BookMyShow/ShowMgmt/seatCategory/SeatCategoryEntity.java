@@ -22,5 +22,4 @@ public class SeatCategoryEntity {
     @Column(length = 255)
     private String description; // short description
 
-    // getters & setters
 }

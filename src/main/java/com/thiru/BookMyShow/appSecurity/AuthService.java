@@ -27,8 +27,8 @@ public class AuthService {
 
     public String generateRefreshToken(UserEntity user) {
         return Jwts.builder()
-                .setSubject(user.getName())
-                .claim("role", user.getRole().name())
+                .setSubject(user.getUserName())
+                .claim("role", user.getRole())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtProps.getRefreshTokenValidityMs()))
                 .signWith(jwtProps.getKey(), SignatureAlgorithm.HS256)
@@ -70,7 +70,7 @@ public class AuthService {
             throw new IllegalArgumentException("Authorization header missing");
         } else if (authHeader.startsWith("Bearer")) {
             authType = AuthType.JWT;
-            request.setPassword(authHeader.substring(7));
+            request.setCredential(authHeader.substring(7));
         } else if (authHeader.startsWith("Basic")) {
             authType = AuthType.BASIC;
             String basicToken = new String(
@@ -78,7 +78,7 @@ public class AuthService {
                     StandardCharsets.UTF_8);
 
             request.setUserName(basicToken.split(":")[0]);
-            request.setPassword(basicToken.split(":")[1]);
+            request.setCredential(basicToken.split(":")[1]);
         } else
             throw new IllegalArgumentException("Unsupported Authorization type");
         request.setAuthType(authType);

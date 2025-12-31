@@ -10,9 +10,7 @@ import lombok.*;
 @Setter
 public class CreateEvent {
     @NotNull(message = "Event type is required")
-    private String eventType;
-
-    private EventType eventTypeEnum;
+    private EventType eventType;
 
     @NotBlank(message = "Event name is required")
     private String eventName;

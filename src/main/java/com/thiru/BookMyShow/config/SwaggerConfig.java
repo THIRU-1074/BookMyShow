@@ -9,25 +9,25 @@ import io.swagger.v3.oas.models.Components;
 @Configuration
 public class SwaggerConfig {
 
-    @Bean
-    public OpenAPI openAPI() {
+        @Bean
+        public OpenAPI openAPI() {
 
-        // 🔑 Bearer JWT
-        SecurityScheme bearerAuth = new SecurityScheme()
-                .name("bearerAuth")
-                .type(SecurityScheme.Type.HTTP)
-                .scheme("bearer")
-                .bearerFormat("JWT");
+                // 🔑 Bearer JWT
+                SecurityScheme bearerAuth = new SecurityScheme()
+                                .name("bearerAuth")
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT");
 
-        // 🔐 Basic Auth
-        SecurityScheme basicAuth = new SecurityScheme()
-                .name("basicAuth")
-                .type(SecurityScheme.Type.HTTP)
-                .scheme("basic");
+                // 🔐 Basic Auth
+                SecurityScheme basicAuth = new SecurityScheme()
+                                .name("basicAuth")
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("basic");
 
-        return new OpenAPI()
-                .components(new Components()
-                        .addSecuritySchemes("bearerAuth", bearerAuth)
-                        .addSecuritySchemes("basicAuth", basicAuth));
-    }
+                return new OpenAPI()
+                                .components(new Components()
+                                                .addSecuritySchemes("bearerAuth", bearerAuth)
+                                                .addSecuritySchemes("basicAuth", basicAuth));
+        }
 }
