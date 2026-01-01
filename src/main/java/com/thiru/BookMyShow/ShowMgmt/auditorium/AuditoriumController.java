@@ -57,7 +57,7 @@ public class AuditoriumController {
 
         @GetMapping("/readAuditorium")
         public ResponseEntity<?> readAuditorium(
-                        @RequestBody readAuditorium auditoriumDTO,
+                        @ModelAttribute readAuditorium auditoriumDTO,
                         Authentication authentication) {
 
                 Claims claims = (Claims) authentication.getPrincipal();

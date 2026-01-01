@@ -31,7 +31,7 @@ public class ShowSeatController {
 
     @GetMapping("/readShowSeat")
     public ResponseEntity<?> readshowSeat(
-            @RequestBody ReadShowSeat showSeatDTO,
+            @ModelAttribute ReadShowSeat showSeatDTO,
             Authentication authentication) {
 
         List<ShowSeatReadResponse> showSeats = showSeatService.read(showSeatDTO);

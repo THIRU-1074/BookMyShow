@@ -1,4 +1,4 @@
-package com.thiru.BookMyShow.ShowMgmt.event;
+package com.thiru.BookMyShow.ShowMgmt.show;
 
 public enum Genre {
     ACTION,

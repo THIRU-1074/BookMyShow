@@ -21,11 +21,6 @@ public class EventEntity {
     @Column(name = "eventId")
     private Long eventId;
 
-    /**
-     * Admin who created/manages this event
-     * MANY events -> ONE admin (user)
-     */
-
     @Enumerated(EnumType.STRING)
     @Column(name = "eventType", nullable = false)
     private EventType eventType;
@@ -39,4 +34,5 @@ public class EventEntity {
 
     @OneToMany(mappedBy = "event", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ShowEntity> shows;
+
 }

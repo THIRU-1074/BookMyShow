@@ -43,7 +43,7 @@ public class BookingController {
     @GetMapping("/readBookings")
     public ResponseEntity<Long> readBooking(
             Authentication authentication,
-            @RequestBody @Valid ReadBookings request) {
+            @ModelAttribute @Valid ReadBookings request) {
         Claims claims = (Claims) authentication.getPrincipal();
         request.setUserName(claims.getSubject());
         bookingService.readBookings(request);

@@ -303,6 +303,7 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
                                 .auditoriumId(s.getAuditorium().getAuditoriumId())
                                 .genres(s.getGenres())
                                 .languages(s.getLanguages())
+                                .availableSeatCount(s.getAvailableSeatCount())
                                 .build();
         }
 }

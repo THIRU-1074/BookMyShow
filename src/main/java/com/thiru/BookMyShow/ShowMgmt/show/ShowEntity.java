@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 
 import com.thiru.BookMyShow.ShowMgmt.auditorium.AuditoriumEntity;
 import com.thiru.BookMyShow.ShowMgmt.event.EventEntity;
-import com.thiru.BookMyShow.ShowMgmt.event.Genre;
 
 @Entity
 @Table(name = "shows")

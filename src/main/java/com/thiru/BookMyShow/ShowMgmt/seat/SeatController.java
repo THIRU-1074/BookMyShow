@@ -43,7 +43,7 @@ public class SeatController {
 
         @GetMapping("/readseat")
         public ResponseEntity<?> readseat(
-                        @RequestBody ReadSeats seatDTO,
+                        @ModelAttribute ReadSeats seatDTO,
                         Authentication authentication) {
 
                 List<SeatReadResponse> seats = seatService.read(seatDTO);

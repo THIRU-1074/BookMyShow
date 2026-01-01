@@ -3,7 +3,6 @@ package com.thiru.BookMyShow.ShowMgmt.show.DTO;
 import lombok.*;
 import java.util.*;
 
-import com.thiru.BookMyShow.ShowMgmt.event.*;
 import com.thiru.BookMyShow.ShowMgmt.show.*;
 
 import java.time.LocalDateTime;
@@ -23,4 +22,6 @@ public class ShowReadResponse {
 
     private Set<Genre> genres;
     private Set<Language> languages;
+
+    private Long availableSeatCount;
 }

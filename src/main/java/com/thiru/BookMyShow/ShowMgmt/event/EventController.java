@@ -56,7 +56,7 @@ public class EventController {
 
         @GetMapping("/readEvent")
         public ResponseEntity<?> readevent(
-                        @RequestBody ReadEvent eventDTO,
+                        @ModelAttribute ReadEvent eventDTO,
                         Authentication authentication) {
 
                 Claims claims = (Claims) authentication.getPrincipal();

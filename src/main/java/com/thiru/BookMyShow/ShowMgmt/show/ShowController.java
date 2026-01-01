@@ -57,7 +57,7 @@ public class ShowController {
 
         @GetMapping("/readShow")
         public ResponseEntity<?> readshow(
-                        @RequestBody ReadShow showDTO,
+                        @ModelAttribute ReadShow showDTO,
                         Authentication authentication) {
 
                 Claims claims = (Claims) authentication.getPrincipal();

@@ -30,7 +30,7 @@ public class VenueController {
 
     @GetMapping("/readvenue")
     public ResponseEntity<?> readvenue(
-            @RequestBody ReadVenue venueDTO,
+            @ModelAttribute ReadVenue venueDTO,
             Authentication authentication) {
 
         List<VenueReadResponse> venues = venueService.read(venueDTO);

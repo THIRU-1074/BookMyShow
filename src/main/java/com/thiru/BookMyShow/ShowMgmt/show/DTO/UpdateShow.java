@@ -5,7 +5,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import com.thiru.BookMyShow.ShowMgmt.event.Genre;
 import com.thiru.BookMyShow.ShowMgmt.show.*;
 
 @Getter
