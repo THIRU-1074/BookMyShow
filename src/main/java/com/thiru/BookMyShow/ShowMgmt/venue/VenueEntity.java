@@ -7,7 +7,9 @@ import java.util.*;
 import com.thiru.BookMyShow.ShowMgmt.auditorium.AuditoriumEntity;
 
 @Entity
-@Table(name = "venues")
+@Table(name = "venue", indexes = {
+        @Index(name = "idx_venue_city", columnList = "city")
+})
 @Getter
 @Setter
 @NoArgsConstructor

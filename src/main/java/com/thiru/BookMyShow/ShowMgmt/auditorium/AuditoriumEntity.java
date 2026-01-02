@@ -1,8 +1,5 @@
 package com.thiru.BookMyShow.ShowMgmt.auditorium;
 
-import java.util.*;
-
-import com.thiru.BookMyShow.ShowMgmt.seat.SeatEntity;
 import com.thiru.BookMyShow.ShowMgmt.venue.VenueEntity;
 import com.thiru.BookMyShow.userMgmt.UserEntity;
 
@@ -10,7 +7,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "auditoriums")
+@Table(name = "auditoriums", indexes = {
+        @Index(name = "idx_auditorium_venue_id", columnList = "venue_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor

@@ -7,7 +7,12 @@ import java.util.List;
 import com.thiru.BookMyShow.bookingMgmt.BookingEntity;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+
+        // frequent profile / auth lookup
+        @Index(name = "idx_user_username", columnList = "user_name")
+
+})
 @Getter
 @Setter
 @NoArgsConstructor

@@ -9,8 +9,9 @@ import com.thiru.BookMyShow.ShowMgmt.show.*;
 
 @Entity
 @Table(name = "show_seat_pricing", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "show_id", "seat_category_id" })
-})
+        @UniqueConstraint(columnNames = { "show_id", "seat_category_id" }) }, indexes = {
+                @Index(name = "idx_show_seat_pricing_show_id", columnList = "show_id")
+        })
 @Getter
 @Setter
 @NoArgsConstructor

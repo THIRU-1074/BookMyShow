@@ -8,7 +8,20 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "show_seats", uniqueConstraints = @UniqueConstraint(columnNames = { "show_id", "seat_id" }))
+@Table(name = "show_seat", uniqueConstraints = @UniqueConstraint(columnNames = { "show_id", "seat_id" }), indexes = {
+
+        // show → seats lookup
+        @Index(name = "idx_show_seat_show_id", columnList = "show_id"),
+
+        // seat locking
+        @Index(name = "idx_show_seat_show_seat", columnList = "show_id, seat_id"),
+
+        // availability filtering
+        @Index(name = "idx_show_seat_show_status", columnList = "show_id, show_seat_availability_status"),
+
+        // category grouping
+        @Index(name = "idx_show_seat_show_category", columnList = "show_id, category_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor

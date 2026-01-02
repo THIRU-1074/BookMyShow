@@ -8,7 +8,9 @@ import com.thiru.BookMyShow.ShowMgmt.show.ShowEntity;
 import com.thiru.BookMyShow.userMgmt.UserEntity;
 
 @Entity
-@Table(name = "events")
+@Table(name = "event", indexes = {
+        @Index(name = "idx_event_type", columnList = "event_type")
+})
 @Getter
 @Setter
 @NoArgsConstructor

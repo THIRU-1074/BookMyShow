@@ -6,7 +6,16 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "seats", uniqueConstraints = @UniqueConstraint(columnNames = { "auditorium_id", "seat_no" }))
+@Table(name = "seats", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_seat_auditorium_seatno", columnNames = { "auditorium_id", "seat_no" })
+}, indexes = {
+
+        // fast full seating load
+        @Index(name = "idx_seat_auditorium_id", columnList = "auditorium_id"),
+
+        // fast ordered seating layout
+        @Index(name = "idx_seat_auditorium_layout", columnList = "auditorium_id, row_no, col_no")
+})
 @Getter
 @Setter
 @AllArgsConstructor
