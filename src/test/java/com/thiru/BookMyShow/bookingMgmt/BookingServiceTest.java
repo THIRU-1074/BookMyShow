@@ -56,6 +56,8 @@ class BookingServiceTest {
     private PaymentGateway paymentGateway;
     @Mock
     private ShowSeatPricingRepository pricingRepository;
+    @Mock
+    private BookingEventPublisher bookingEventPublisher;
 
     private BookingService bookingService;
 
@@ -69,7 +71,8 @@ class BookingServiceTest {
                 venueService,
                 seatService,
                 paymentGateway,
-                pricingRepository);
+                pricingRepository,
+                bookingEventPublisher);
     }
 
     @Test

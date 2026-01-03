@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -19,6 +20,13 @@ import java.util.List;
 public class JwtAuthenticationFilterService extends OncePerRequestFilter {
 
     private final AuthService authService;
+    private static final AntPathMatcher matcher = new AntPathMatcher();
+
+    private static final List<String> PUBLIC_ENDPOINTS = List.of(
+            "/users/login",
+            "/users/signup",
+            "/swagger-ui/**",
+            "/v3/api-docs/**");
 
     public JwtAuthenticationFilterService(AuthService authService) {
         this.authService = authService;
@@ -67,7 +75,7 @@ public class JwtAuthenticationFilterService extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
-        return path.equals("/users/login") || path.equals("/users/signup");
+        return PUBLIC_ENDPOINTS.stream()
+                .anyMatch(p -> matcher.match(p, request.getRequestURI()));
     }
 }

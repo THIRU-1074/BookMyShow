@@ -1,6 +1,8 @@
 package com.thiru.BookMyShow.searchBrowse;
 
 import lombok.*;
+
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import java.time.LocalDateTime;
@@ -19,12 +21,14 @@ public class SearchBrowseService {
         private final SearchBrowseRepository searchBrowseRepo;
         private final ShowRepository showRepo;
 
+        @Cacheable(value = "showDetails", key = "#request.showId")
         public ViewShowDetailResponse viewShow(ViewShowDetail request) {
                 ShowEntity show = showRepo.findByShowId(request.getShowId())
                                 .orElseThrow(() -> new ResourceNotFoundException("Invalid show id"));
                 return toViewShowDetailResponse(show);
         }
 
+        @Cacheable(value = "showGroups", key = "#request.venueId + ':' + #request.date")
         public ViewShowGroupResponse viewShowGroup(ViewShowGroup request) {
 
                 // 1. Convert LocalDate → LocalDateTime range
@@ -63,6 +67,7 @@ public class SearchBrowseService {
                                 .build();
         }
 
+        @Cacheable(value = "browseEvents", key = "#request.city + ':' + #request.genre + ':' + #request.language + ':' + #request.date")
         public BrowseEventResponse browse(BrowseEvent request) {
 
                 LocalDateTime start = null;

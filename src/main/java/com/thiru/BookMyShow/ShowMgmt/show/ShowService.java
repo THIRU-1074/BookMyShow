@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.jpa.domain.Specification;
 import java.util.*;
 import jakarta.persistence.criteria.Predicate;
@@ -100,6 +102,10 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
                 showSeatService.createShowSeats(showEntity.getShowId());
         }
 
+        @Caching(evict = {
+                        @CacheEvict(value = "showDetails", key = "#showId"),
+                        @CacheEvict(value = "showGroups", allEntries = true)
+        })
         public void update(UpdateShow request) {
                 // 1️⃣ Load user
                 UserEntity user = userRepo.findByUserName(request.getUserName())

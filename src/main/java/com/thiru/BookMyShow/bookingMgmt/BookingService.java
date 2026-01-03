@@ -38,6 +38,7 @@ public class BookingService {
         private final SeatService seatService;
         private final PaymentGateway paymentGateway;
         private final ShowSeatPricingRepository pricingRepo;
+        private final BookingEventPublisher bookingEventPublisher;
 
         public void createBookings(CreateBookings req) {
                 UserEntity user = userRepo.findByUserName(req.getUserName())
@@ -65,6 +66,18 @@ public class BookingService {
 
                 // 🎯 FINALIZE BOOKINGS
                 bookings.forEach(this::finalizeBooking);
+                BookingConfirmedEvent event = new BookingConfirmedEvent(
+                                bookings.get(0).getBookingId(),
+                                user.getUserName(),
+                                user.getMailId(),
+                                bookings.stream()
+                                                .map(b -> b.getShowSeat()
+                                                                .getSeat()
+                                                                .getSeatNo())
+                                                .toList(),
+                                calculateAmount(bookings));
+
+                bookingEventPublisher.publishBookingConfirmed(event);
         }
 
         public BookingEntity prepareBooking(CreateBooking req, UserEntity user) {
