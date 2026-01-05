@@ -7,7 +7,6 @@ import java.util.*;
 @Getter
 @Setter
 public class CreateBookings {
-    @NotBlank
     private String userName;
 
     @NotEmpty

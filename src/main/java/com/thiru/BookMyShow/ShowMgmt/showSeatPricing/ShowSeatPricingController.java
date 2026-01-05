@@ -32,4 +32,11 @@ public class ShowSeatPricingController {
         pricingService.deletePricing(id, claims.getSubject());
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/getShowSeatPricing")
+    public ResponseEntity<PricingReadResponse> getPricing(
+            @ModelAttribute ReadShowSeatPricing request, Authentication authentication) {
+        PricingReadResponse prices = pricingService.readPricingByShow(request);
+        return ResponseEntity.ok(prices);
+    }
 }

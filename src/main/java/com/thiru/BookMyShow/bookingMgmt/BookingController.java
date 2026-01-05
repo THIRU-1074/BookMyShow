@@ -6,6 +6,7 @@ import org.springframework.http.*;
 import lombok.RequiredArgsConstructor;
 import io.jsonwebtoken.*;
 import jakarta.validation.*;
+import java.util.*;
 import com.thiru.BookMyShow.bookingMgmt.DTO.*;
 
 @RestController
@@ -25,11 +26,11 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBooking(@PathVariable Long id) {
-        bookingService.deleteBooking(id);
-        return ResponseEntity.noContent().build();
-    }
+    // @DeleteMapping("/{id}")
+    // public ResponseEntity<Void> deleteBooking(@PathVariable Long id) {
+    // bookingService.deleteBooking(id);
+    // return ResponseEntity.noContent().build();
+    // }
 
     @DeleteMapping("/deleteBookings")
     public ResponseEntity<Long> deleteBookings(Authentication authentication,
@@ -41,12 +42,12 @@ public class BookingController {
     }
 
     @GetMapping("/readBookings")
-    public ResponseEntity<Long> readBooking(
+    public ResponseEntity<?> readBooking(
             Authentication authentication,
             @ModelAttribute @Valid ReadBookings request) {
         Claims claims = (Claims) authentication.getPrincipal();
         request.setUserName(claims.getSubject());
-        bookingService.readBookings(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        List<ReadBookingResponse> bookings = bookingService.readBookings(request);
+        return ResponseEntity.ok(bookings);
     }
 }

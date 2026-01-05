@@ -103,7 +103,7 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
         }
 
         @Caching(evict = {
-                        @CacheEvict(value = "showDetails", key = "#showId"),
+                        @CacheEvict(value = "showDetails", key = "#request.showId"),
                         @CacheEvict(value = "showGroups", allEntries = true)
         })
         public void update(UpdateShow request) {
