@@ -7,39 +7,40 @@ import lombok.*;
 
 @Entity
 @Table(name = "seats", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_seat_auditorium_seatno", columnNames = { "auditorium_id", "seat_no" })
+                @UniqueConstraint(name = "uk_seat_auditorium_seatno", columnNames = { "auditorium_id", "seat_no" })
 }, indexes = {
 
-        // fast full seating load
-        @Index(name = "idx_seat_auditorium_id", columnList = "auditorium_id"),
+                // fast full seating load
+                @Index(name = "idx_seat_auditorium_id", columnList = "auditorium_id"),
 
-        // fast ordered seating layout
-        @Index(name = "idx_seat_auditorium_layout", columnList = "auditorium_id, row_no, col_no")
+                // fast ordered seating layout
+                @Index(name = "idx_seat_auditorium_layout", columnList = "auditorium_id, row_no, col_no")
 })
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class SeatEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long seatId;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long seatId;
 
-    @Column(name = "seatNo")
-    private String seatNo; // A1, A2, B3 etc
+        @Column(name = "seatNo")
+        private String seatNo; // A1, A2, B3 etc
 
-    @Column(name = "rowNo")
-    private final Integer row;
+        @Column(name = "rowNo")
+        private Integer row;
 
-    @Column(name = "colNo")
-    private final Integer col;
+        @Column(name = "colNo")
+        private Integer col;
 
-    @Column(name = "stanceNo")
-    private final Integer stance;
+        @Column(name = "stanceNo")
+        private Integer stance;
 
-    @ManyToOne
-    @JoinColumn(name = "auditoriumId")
-    private AuditoriumEntity auditorium;
+        @ManyToOne
+        @JoinColumn(name = "auditoriumId")
+        private AuditoriumEntity auditorium;
 
 }

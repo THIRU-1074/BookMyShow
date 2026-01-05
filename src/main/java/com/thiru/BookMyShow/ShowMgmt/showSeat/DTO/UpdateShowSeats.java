@@ -1,7 +1,6 @@
 package com.thiru.BookMyShow.ShowMgmt.showSeat.DTO;
 
 import lombok.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.*;
@@ -9,8 +8,9 @@ import java.util.*;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateShowSeats {
-    @NotBlank(message = "user name required...!")
     private String userName;
 
     @NotNull(message = "showId is required")

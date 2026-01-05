@@ -12,6 +12,7 @@ import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import com.thiru.BookMyShow.ShowMgmt.auditorium.AuditoriumEntity;
 import com.thiru.BookMyShow.ShowMgmt.event.EventEntity;
 import com.thiru.BookMyShow.ShowMgmt.event.EventType;
+import com.thiru.BookMyShow.ShowMgmt.show.ShowRepository;
 import com.thiru.BookMyShow.ShowMgmt.venue.VenueEntity;
 import com.thiru.BookMyShow.testutil.BookingTestDataFactory;
 import com.thiru.BookMyShow.userMgmt.Role;

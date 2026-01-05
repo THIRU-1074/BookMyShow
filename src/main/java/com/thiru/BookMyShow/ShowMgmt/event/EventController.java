@@ -28,7 +28,7 @@ public class EventController {
                                 .status(HttpStatus.CREATED).body(null);
         }
 
-        @PatchMapping("/updateevent")
+        @PatchMapping("/updateEvent")
         public ResponseEntity<?> updateevent(
                         @RequestBody UpdateEvent eventDTO,
                         Authentication authentication) {

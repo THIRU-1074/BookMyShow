@@ -10,6 +10,8 @@ import lombok.*;
 @Setter
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class SeatCategoryEntity {
 
     @Id

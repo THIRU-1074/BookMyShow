@@ -59,9 +59,9 @@ public class ShowSeatPricingService implements AuthorizationPolicy<ShowSeatPrici
                                                 HttpStatus.NOT_FOUND,
                                                 "User not found: " + userName));
                 this.canCreate(ue);
-                if (showSeatPricingRepo.existsByShow_ShowIdAndSeatCategory_Id(
+                if (showSeatPricingRepo.existsByShow_ShowIdAndSeatCategory_Name(
                                 request.getShowId(),
-                                request.getSeatCategoryId())) {
+                                request.getSeatCategoryName())) {
                         throw new IllegalStateException(
                                         "Pricing already exists for this show and seat category");
                 }
@@ -69,7 +69,7 @@ public class ShowSeatPricingService implements AuthorizationPolicy<ShowSeatPrici
                 ShowEntity show = showRepo.findById(request.getShowId())
                                 .orElseThrow(() -> new EntityNotFoundException("Show not found"));
 
-                SeatCategoryEntity seatCategory = seatCategoryRepo.findById(request.getSeatCategoryId())
+                SeatCategoryEntity seatCategory = seatCategoryRepo.findByName(request.getSeatCategoryName())
                                 .orElseThrow(() -> new EntityNotFoundException(
                                                 "Seat category not found"));
 

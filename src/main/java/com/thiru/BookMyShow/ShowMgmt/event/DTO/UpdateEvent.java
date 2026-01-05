@@ -2,19 +2,18 @@ package com.thiru.BookMyShow.ShowMgmt.event.DTO;
 
 import com.thiru.BookMyShow.ShowMgmt.event.EventType;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
 @Setter
 public class UpdateEvent {
-    @NotBlank(message = "event Id is required to update")
+    @NotNull(message = "event Id is required to update")
     private Long eventId;
 
     private EventType eventType;
 
     private String eventName;
 
-    @NotBlank(message = "User name is required")
     private String userName;
 }

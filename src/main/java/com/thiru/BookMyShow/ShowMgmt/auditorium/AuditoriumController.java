@@ -52,6 +52,7 @@ public class AuditoriumController {
                 auditoriumService.delete(auditoriumDTO);
 
                 return ResponseEntity
+
                                 .noContent().build();
         }
 
@@ -63,7 +64,6 @@ public class AuditoriumController {
                 Claims claims = (Claims) authentication.getPrincipal();
                 auditoriumDTO.setUserName(claims.getSubject());
                 List<AuditoriumReadResponse> auditoriums = auditoriumService.read(auditoriumDTO);
-
                 return ResponseEntity
                                 .ok(auditoriums);
         }

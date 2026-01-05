@@ -87,9 +87,9 @@ public class ShowSeatService implements AuthorizationPolicy<ShowEntity, UserEnti
         }
 
         // 5️⃣ Create ShowSeat entries
-        SeatCategoryEntity seatCategory = seatCategoryRepo.findByName("REGULAR")
+        SeatCategoryEntity seatCategory = seatCategoryRepo.findByName("STANDARD")
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Seat Category not dound...! " + showId));
+                        "Seat Category not found...! " + showId));
         List<ShowSeatEntity> showSeats = seats.stream()
                 .map(seat -> {
                     ShowSeatEntity ss = new ShowSeatEntity();
@@ -197,7 +197,7 @@ public class ShowSeatService implements AuthorizationPolicy<ShowEntity, UserEnti
                 .showSeatId(ss.getShowSeatId())
                 .seatId(ss.getSeat().getSeatId())
                 .seatNo(ss.getSeat().getSeatNo())
-                .category(ss.getShowSeatCategory())
+                .category(ss.getShowSeatCategory().getName())
                 .status(ss.getShowSeatAvailabilityStatus())
                 .build();
     }

@@ -12,7 +12,6 @@ public class ShowSeatReadResponse {
     private Long showSeatId;
     private Long seatId;
     private String seatNo;
-
-    private SeatCategoryEntity category;
+    private String category;
     private SeatAvailabilityStatus status;
 }

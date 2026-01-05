@@ -7,14 +7,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateSeatCategoryRequest {
+public class CreateSeatCategory {
 
     @NotBlank(message = "Category name is required")
     @Size(max = 50)
     private String name;
 
-    @NotBlank(message = "UserName is required")
-    String userName;
+    private String userName;
 
     @Size(max = 255)
     private String description;

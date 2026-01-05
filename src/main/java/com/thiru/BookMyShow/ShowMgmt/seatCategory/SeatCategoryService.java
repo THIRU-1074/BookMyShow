@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.access.AccessDeniedException;
+
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,7 +27,7 @@ public class SeatCategoryService {
         throw new AccessDeniedException("Only Admin can create...!");
     }
 
-    public SeatCategoryResponse create(CreateSeatCategoryRequest request) {
+    public SeatCategoryResponse create(CreateSeatCategory request) {
         UserEntity ue = userRepo.findByUserName(request.getUserName())
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
@@ -49,4 +52,41 @@ public class SeatCategoryService {
                 .description(saved.getDescription())
                 .build();
     }
+
+    public List<SeatCategoryResponse> read(ReadSeatCategory request) {
+
+        List<SeatCategoryEntity> categories;
+
+        if (request.getId() != null) {
+
+            SeatCategoryEntity category = seatCategoryRepo.findById(request.getId())
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.NOT_FOUND,
+                            "Seat category not found: " + request.getId()));
+
+            categories = List.of(category);
+
+        } else if (request.getName() != null) {
+
+            SeatCategoryEntity category = seatCategoryRepo.findByName(
+                    request.getName().toUpperCase()).orElseThrow(
+                            () -> new ResponseStatusException(
+                                    HttpStatus.NOT_FOUND,
+                                    "Seat category not found: " + request.getId()));
+            categories = List.of(category);
+
+        } else {
+
+            categories = seatCategoryRepo.findAll();
+        }
+
+        return categories.stream()
+                .map(cat -> SeatCategoryResponse.builder()
+                        .id(cat.getId())
+                        .name(cat.getName())
+                        .description(cat.getDescription())
+                        .build())
+                .toList();
+    }
+
 }

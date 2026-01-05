@@ -10,13 +10,12 @@ public class CreateShowSeatPricing {
     @NotNull
     private Long showId;
 
-    @NotNull
-    private Long seatCategoryId;
+    @NotBlank
+    private String seatCategoryName;
 
     @NotNull
     @Positive
     private Double price;
 
-    @NotBlank(message = "user Name required...!")
     private String userName;
 }

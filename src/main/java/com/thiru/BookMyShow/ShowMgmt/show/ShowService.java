@@ -220,8 +220,8 @@ public class ShowService implements AuthorizationPolicy<ShowEntity, UserEntity> 
 
                         // ownership / visibility filter
                         predicates.add(cb.equal(
-                                        root.get("admin").get("userId"),
-                                        user.getUserId()));
+                                        root.get("event").get("admin"),
+                                        user));
 
                         if (r.getEventId() != null)
                                 predicates.add(cb.equal(

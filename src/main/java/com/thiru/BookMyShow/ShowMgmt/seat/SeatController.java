@@ -15,7 +15,7 @@ import com.thiru.BookMyShow.ShowMgmt.seat.DTO.*;
 public class SeatController {
         private final SeatService seatService;
 
-        @PostMapping("/createseat")
+        @PostMapping("/createSeat")
         public ResponseEntity<?> createseat(
                         @RequestBody CreateSeats seatDTO,
                         Authentication authentication) {
@@ -41,7 +41,7 @@ public class SeatController {
                                 .noContent().build();
         }
 
-        @GetMapping("/readseat")
+        @GetMapping("/readSeat")
         public ResponseEntity<?> readseat(
                         @ModelAttribute ReadSeats seatDTO,
                         Authentication authentication) {

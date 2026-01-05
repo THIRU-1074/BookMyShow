@@ -1,6 +1,7 @@
 package com.thiru.BookMyShow.ShowMgmt.show.DTO;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -25,9 +26,9 @@ public class UpdateShow {
 
     private Set<Language> languages;
 
-    @NotBlank(message = "User name is required...!")
     private String userName;
 
+    @NotNull(message = "Show id is required...!")
     private Long showId;
 
     private Long BookedSeatCount;

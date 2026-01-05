@@ -19,7 +19,8 @@ public class ShowSeatPricingController {
     @PostMapping("/createShowSeatPricing")
     public ResponseEntity<Long> createPricing(
             @Valid @RequestBody CreateShowSeatPricing request, Authentication authentication) {
-
+        Claims claims = (Claims) authentication.getPrincipal();
+        request.setUserName(claims.getSubject());
         Long id = pricingService.createPricing(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }

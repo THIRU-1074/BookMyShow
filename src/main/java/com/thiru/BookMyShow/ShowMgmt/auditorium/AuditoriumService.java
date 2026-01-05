@@ -15,8 +15,11 @@ import com.thiru.BookMyShow.userMgmt.Role;
 import com.thiru.BookMyShow.userMgmt.UserEntity;
 import com.thiru.BookMyShow.userMgmt.UserRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuditoriumService implements AuthorizationPolicy<AuditoriumEntity, UserEntity> {
     private final AuditoriumRepository auditoriumRepo;
     private final VenueRepository venueRepo;
@@ -75,6 +78,7 @@ public class AuditoriumService implements AuthorizationPolicy<AuditoriumEntity, 
         AuditoriumEntity auditoriumEntity = AuditoriumEntity.builder()
                 .auditoriumName(auditorium.getAuditoriumName())
                 .venue(venue)
+                .admin(ue)
                 .build();
 
         // 4️⃣ Persist

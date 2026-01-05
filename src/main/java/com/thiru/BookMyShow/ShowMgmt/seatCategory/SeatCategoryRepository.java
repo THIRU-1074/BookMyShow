@@ -10,4 +10,6 @@ public interface SeatCategoryRepository
     Optional<SeatCategoryEntity> findByName(String name);
 
     boolean existsByName(String name);
+
+    Optional<SeatCategoryEntity> findById(Long id);
 }

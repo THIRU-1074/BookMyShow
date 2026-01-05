@@ -1,15 +1,18 @@
 package com.thiru.BookMyShow.ShowMgmt.event;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.access.AccessDeniedException;
 import java.util.*;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Join;
 
 import com.thiru.BookMyShow.ShowMgmt.AuthorizationPolicy;
-import com.thiru.BookMyShow.ShowMgmt.event.DTO.*;
 import com.thiru.BookMyShow.userMgmt.*;
+import com.thiru.BookMyShow.ShowMgmt.event.DTO.*;
 
 @Service
 @RequiredArgsConstructor
@@ -94,24 +97,46 @@ public class EventService implements AuthorizationPolicy<EventEntity, UserEntity
         eventRepo.delete(existing);
     }
 
+    public static Specification<EventEntity> withFilters(ReadEvent r) {
+
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (r.getEventId() != null) {
+                predicates.add(cb.equal(
+                        root.get("eventId"),
+                        r.getEventId()));
+            }
+
+            if (r.getEventName() != null) {
+                predicates.add(cb.like(
+                        cb.lower(root.get("eventName")),
+                        "%" + r.getEventName().toLowerCase() + "%"));
+            }
+
+            if (r.getEventType() != null) {
+                predicates.add(cb.equal(
+                        root.get("eventType"),
+                        r.getEventType()));
+            }
+
+            if (r.getUserName() != null) {
+                Join<EventEntity, UserEntity> adminJoin = root.join("admin");
+
+                predicates.add(cb.equal(
+                        adminJoin.get("userName"),
+                        r.getUserName()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
     public List<EventReadResponse> read(ReadEvent request) {
+
         this.canRead(null, null);
-        List<EventEntity> events = new ArrayList<>();
-        if (request.getEventId() != null) {
-            events.add(eventRepo.findByEventId(request.getEventId()));
-        } else if (request.getUserName() != null) {
-            UserEntity admin = userRepo.findByUserName(request.getUserName())
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.NOT_FOUND,
-                            "User not found: " + request.getUserName()));
-            events = eventRepo.findByAdmin_UserId(admin.getUserId());
-        } else if (request.getEventName() != null && request.getEventType() != null) {
-            events = eventRepo.findByEventNameAndEventType(request.getEventName(), request.getEventType());
-        } else if (request.getEventName() != null) {
-            events = eventRepo.findByEventName(request.getEventName());
-        } else if (request.getEventType() != null) {
-            events = eventRepo.findByEventType(request.getEventType());
-        }
+
+        List<EventEntity> events = eventRepo.findAll(EventService.withFilters(request));
 
         return events.stream()
                 .map(this::toResponse)

@@ -22,7 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thiru.BookMyShow.ShowMgmt.seatCategory.DTO.CreateSeatCategoryRequest;
+import com.thiru.BookMyShow.ShowMgmt.seatCategory.DTO.CreateSeatCategory;
 import com.thiru.BookMyShow.ShowMgmt.seatCategory.DTO.SeatCategoryResponse;
 
 import io.jsonwebtoken.Claims;
@@ -48,7 +48,7 @@ class SeatCategoryControllerTest {
 
     @Test
     void createCategoryInjectsUser() throws Exception {
-        CreateSeatCategoryRequest request = new CreateSeatCategoryRequest();
+        CreateSeatCategory request = new CreateSeatCategory();
         request.setName("VIP");
         request.setDescription("desc");
 
@@ -61,7 +61,7 @@ class SeatCategoryControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
 
-        ArgumentCaptor<CreateSeatCategoryRequest> captor = ArgumentCaptor.forClass(CreateSeatCategoryRequest.class);
+        ArgumentCaptor<CreateSeatCategory> captor = ArgumentCaptor.forClass(CreateSeatCategory.class);
         verify(seatCategoryService).create(captor.capture());
         assertThat(captor.getValue().getUserName()).isEqualTo("admin");
     }

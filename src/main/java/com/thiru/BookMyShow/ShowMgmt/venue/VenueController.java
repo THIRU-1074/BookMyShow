@@ -28,7 +28,7 @@ public class VenueController {
                 .status(HttpStatus.CREATED).body(null);
     }
 
-    @GetMapping("/readvenue")
+    @GetMapping("/readVenue")
     public ResponseEntity<?> readvenue(
             @ModelAttribute ReadVenue venueDTO,
             Authentication authentication) {

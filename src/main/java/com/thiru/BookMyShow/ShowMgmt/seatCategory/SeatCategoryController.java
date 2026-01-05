@@ -2,6 +2,9 @@ package com.thiru.BookMyShow.ShowMgmt.seatCategory;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +20,9 @@ public class SeatCategoryController {
 
     private final SeatCategoryService seatCategoryService;
 
-    @PostMapping("/createCategory")
+    @PostMapping("/createSeatCategory")
     public ResponseEntity<SeatCategoryResponse> create(Authentication authentication,
-            @Valid @RequestBody CreateSeatCategoryRequest request) {
+            @Valid @RequestBody CreateSeatCategory request) {
         Claims claims = (Claims) authentication.getPrincipal();
         request.setUserName(claims.getSubject());
         SeatCategoryResponse response = seatCategoryService.create(request);
@@ -28,4 +31,15 @@ public class SeatCategoryController {
                 .status(HttpStatus.CREATED)
                 .body(response);
     }
+
+    @GetMapping("/readSeatCategory")
+    public ResponseEntity<?> read(Authentication authentication,
+            @ModelAttribute ReadSeatCategory request) {
+        List<SeatCategoryResponse> response = seatCategoryService.read(request);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
 }

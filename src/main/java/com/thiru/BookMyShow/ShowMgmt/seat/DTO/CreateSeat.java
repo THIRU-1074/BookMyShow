@@ -16,5 +16,6 @@ public class CreateSeat {
     @NotNull(message = "Required Stance or Section number...!")
     private Integer stance;
 
+    @NotNull(message = "seatNo is required")
     private String seatNo;
 }

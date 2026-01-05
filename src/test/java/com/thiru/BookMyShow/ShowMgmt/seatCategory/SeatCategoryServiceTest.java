@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
-import com.thiru.BookMyShow.ShowMgmt.seatCategory.DTO.CreateSeatCategoryRequest;
+import com.thiru.BookMyShow.ShowMgmt.seatCategory.DTO.CreateSeatCategory;
 import com.thiru.BookMyShow.ShowMgmt.seatCategory.DTO.SeatCategoryResponse;
 import com.thiru.BookMyShow.testutil.BookingTestDataFactory;
 import com.thiru.BookMyShow.userMgmt.Role;
@@ -39,7 +39,7 @@ class SeatCategoryServiceTest {
 
     @Test
     void createPersistsUpperCaseName() {
-        CreateSeatCategoryRequest request = new CreateSeatCategoryRequest();
+        CreateSeatCategory request = new CreateSeatCategory();
         request.setName("vip");
         request.setDescription("desc");
         request.setUserName("admin");
@@ -59,7 +59,7 @@ class SeatCategoryServiceTest {
 
     @Test
     void createThrowsWhenCategoryExists() {
-        CreateSeatCategoryRequest request = new CreateSeatCategoryRequest();
+        CreateSeatCategory request = new CreateSeatCategory();
         request.setName("VIP");
         request.setUserName("admin");
 
@@ -73,7 +73,7 @@ class SeatCategoryServiceTest {
 
     @Test
     void nonAdminCannotCreate() {
-        CreateSeatCategoryRequest request = new CreateSeatCategoryRequest();
+        CreateSeatCategory request = new CreateSeatCategory();
         request.setName("VIP");
         request.setUserName("user");
 
