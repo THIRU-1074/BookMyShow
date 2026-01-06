@@ -1,6 +1,6 @@
 # 🎟️ BookMyShow – Backend System Design & Architecture Showcase
 
-A **scalable, secure, and cleanly architected backend system** inspired by BookMyShow, built using **Spring Boot**, **PostgreSQL**, and **Hexagonal (Ports & Adapters) Architecture**.
+A **scalable, secure, and cleanly architected backend system** inspired by BookMyShow, built using **Spring Boot**, **PostgreSQL**, and **SOLID Principles**.
 
 This project is intentionally designed as a **system design + backend engineering showcase**, focusing on:
 - Clean architecture
@@ -14,7 +14,7 @@ This project is intentionally designed as a **system design + backend engineerin
 ## 📌 Project Goals
 
 - Design a **real-world ticket booking backend**
-- Apply **Hexagonal Architecture** instead of traditional layered MVC
+- Apply **SOLID Principles**
 - Ensure **data integrity & concurrency safety**
 - Keep the codebase **clean, testable, and extensible**
 - Demonstrate **professional backend engineering practices**
@@ -22,38 +22,6 @@ This project is intentionally designed as a **system design + backend engineerin
 ---
 
 ## 🧠 Architectural Overview
-
-### Hexagonal Architecture (Ports & Adapters)
-
-This project follows **Hexagonal Architecture**, ensuring **business logic is completely isolated from frameworks and infrastructure**.
-
-             ┌────────────────────┐
-             │   Controllers      │
-             │ (Inbound Adapters) │
-             └─────────▲──────────┘
-                       │
-             ┌─────────┴──────────┐
-             │   Application      │
-             │     Services       │
-             │ (Use Cases / Core) │
-             └─────────▲──────────┘
-                       │
-             ┌─────────┴──────────┐
-             │     Domain          │
-             │ (Entities + Rules) │
-             └─────────▲──────────┘
-                       │
-             ┌─────────┴──────────┐
-             │ Repositories / DB  │
-             │ (Outbound Adapter) │
-             └────────────────────┘
-
-### Why Hexagonal?
-
-✔ Business logic is **framework-agnostic**  
-✔ Database can be swapped without touching core logic  
-✔ Easy to test using mocks  
-✔ Scales well as complexity grows  
 
 ---
 
